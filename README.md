@@ -5,7 +5,6 @@
 [![dependencies][dependencies-img]][dependencies-url]
 [![downloads][downloads-img]][downloads-url]
 [![license][license-img]][license-url]
-[![chat][chat-img]][chat-url]
 
 > Swippin' and swappin' the foreigns
 
@@ -24,20 +23,18 @@ $ cd token-swap-dapp && npm install
 Originally designed for and utilized by [Shopin][shopin] for their
 token swap in a collaboration between [Shishito][shishito] and [Hanzo][hanzo].
 
-
 ## License
 [MIT][license-url]
 
 [hanzo]:            https://hanzo.ai
 [shishito]:         https://shishi.to
 
+[solidity]:         solidity.readthedocs.io
 [truffle]:          http://truffleframework.com/
 [tests]:            https://github.com/auser/token-swap-dapp/tree/master/test
 
 [build-img]:        https://img.shields.io/travis/auser/token-swap-dapp.svg
 [build-url]:        https://travis-ci.org/auser/token-swap-dapp
-[chat-img]:         https://badges.gitter.im/join-chat.svg
-[chat-url]:         https://gitter.im/auser/token-swap-dapp
 [dependencies-img]: https://david-dm.org/auser/token-swap-dapp.svg
 [dependencies-url]: https://david-dm.org/auser/token-swap-dapp
 [downloads-img]:    https://img.shields.io/npm/dm/token-swap-dapp.svg
