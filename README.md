@@ -26,7 +26,7 @@ token swap in a collaboration between [Shishito][shishito] and [Hanzo][hanzo].
 
 
 ## License
-[BSD][license-url]
+[MIT][license-url]
 
 [hanzo]:            https://hanzo.ai
 [shishito]:         https://shishi.to
