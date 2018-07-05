@@ -1,6 +1,21 @@
 {
   "name": "token-swap-dapp",
   "version": "0.1.0",
+  "description": "Dapp and example Solidity contracts demonstrating a straight-forward token swap.",
+  "homepage": "http://github.com/auser/token-swap-dapp",
+  "repository": "github:auser/token-swap-dapp",
+  "bugs": "http://github.com/auser/token-swap-dapp/issues",
+  "author": "Ari Lerner <ari@shishi.to>",
+  "license": "MIT",
+  "keywords": [
+    "solidity",
+    "dapp",
+    "contracts",
+    "token",
+    "tokens",
+    "token swap",
+    "truffle"
+  ],
   "devDependencies": {
     "autoprefixer": "6.5.1",
     "babel-core": "6.17.0",
