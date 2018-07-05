@@ -80,7 +80,7 @@ npm run build
 ## About
 
 Originally designed for and utilized by [Shopin][shopin] for their
-token swap in a collaboration between [Shishito][shishito] and [Hanzo][hanzo].
+token swap in a collaboration between [Hanzo][hanzo] and [Shishito][shishito].
 
 ## License
 
@@ -88,6 +88,7 @@ token swap in a collaboration between [Shishito][shishito] and [Hanzo][hanzo].
 
 [hanzo]:            https://hanzo.ai
 [shishito]:         https://shishi.to
+[shopin]:           https://shopin.com
 
 [solidity]:         solidity.readthedocs.io
 [truffle]:          http://truffleframework.com/
