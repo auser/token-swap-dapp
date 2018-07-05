@@ -3,7 +3,6 @@
 [![npm][npm-img]][npm-url]
 [![build][build-img]][build-url]
 [![dependencies][dependencies-img]][dependencies-url]
-[![downloads][downloads-img]][downloads-url]
 [![license][license-img]][license-url]
 
 > Swippin' and swappin' the foreigns
