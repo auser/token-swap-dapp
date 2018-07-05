@@ -1,7 +1,6 @@
 {
   "name": "token-swap-dapp",
   "version": "0.1.0",
-  "private": true,
   "devDependencies": {
     "autoprefixer": "6.5.1",
     "babel-core": "6.17.0",
