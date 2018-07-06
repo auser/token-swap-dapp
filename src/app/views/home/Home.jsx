@@ -1,9 +1,6 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
 
-// import WhitelistedInstructions from '../../components/WhitelistedInstructions'
-// import NotWhitelisted from '../../components/NotWhitelisted'
-
 export const Home = (props) => (
   <div className="pure-g">
     <div className="pure-u-1-1">
