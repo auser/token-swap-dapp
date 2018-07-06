@@ -8,6 +8,7 @@ contract SwapContract is Ownable {
     using SafeMath for uint256;
     address public tokenOwner;
     address public tokenAddress;
+    address public controllerTokenAddress;
 
     struct TransferRequest {
         address investor;
@@ -16,10 +17,12 @@ contract SwapContract is Ownable {
         uint index;
     }
 
+    uint256 private constant decimalFactor = 10**uint256(18);
     uint _numRequests;
     mapping (uint => TransferRequest) _requests;
 
     event RequestToTransfer(uint numRequests);
+    event TransferExecuted(uint index, address indexed investor, uint256 amount);
 
     /**
      * @dev only the token owner and owner of the contract
@@ -40,15 +43,18 @@ contract SwapContract is Ownable {
      */
     constructor(
       address _tokenAddress,
+      address _controllerTokenAddress,
       address _tokenOwner
     )
         Ownable()
         public
     {
       require(_tokenAddress != address(0));
+      require(_controllerTokenAddress != address(0));
       require(_tokenOwner != address(0));
 
       tokenAddress = _tokenAddress;
+      controllerTokenAddress = _controllerTokenAddress;
       tokenOwner = _tokenOwner;
     }
 
@@ -76,6 +82,26 @@ contract SwapContract is Ownable {
       return true;
     }
 
+    function executeTransfers()
+        onlyTokenOwner
+        public
+        returns (bool)
+    {
+        if (_numRequests == 0) return false;
+        ERC20 token = ERC20(tokenAddress);
+        uint numRequests = 1; //_numRequests;
+        for (uint i = 0; i < numRequests; i++) {
+            TransferRequest storage req = _requests[i];
+            if (!req.approved) {
+                // Execute transfer
+                token.transfer(req.investor, req.amount);
+                emit TransferExecuted(i, req.investor, req.amount);
+                _requests[i].approved = true;
+            }
+        }
+        return true;
+    }
+
     /**
      * @dev get the token owner address
      * @return address of the token owner
@@ -97,7 +123,15 @@ contract SwapContract is Ownable {
       view
       returns (address)
     {
-      return tokenAddress;
+      return controllerTokenAddress;
+    }
+
+    function getTokenAddress()
+        public
+        view
+        returns (address)
+    {
+        return tokenAddress;
     }
 
     /**
@@ -130,6 +164,22 @@ contract SwapContract is Ownable {
       returns (address)
     {
       return _requests[idx].investor;
+    }
+
+    /**
+     * @dev get the approval status of the transfer request
+     * @param idx the index of the transfer request
+     * @return bool the status of the approved transfer request
+     */
+    function getTransferRequestApproval(
+        uint idx
+    )
+        onlyTokenOwner
+        public
+        view
+        returns (bool)
+    {
+        return _requests[idx].approved;
     }
 
     /**

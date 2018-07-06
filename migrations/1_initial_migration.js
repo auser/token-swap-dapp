@@ -1,5 +1,7 @@
 var Migrations = artifacts.require("./Migrations.sol");
 
-module.exports = function(deployer) {
+const OWNER_ACCOUNT = process.env.OWNER_ACCOUNT
+
+module.exports = function(deployer, environment, [owner]) {
   deployer.deploy(Migrations);
 };
