@@ -1,20 +1,12 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
-export const Syndicate = (props) => (
-  <div className="App">
-    <nav className="navbar pure-menu pure-menu-horizontal">
-      <a href="#" className="pure-menu-heading pure-menu-link">
-        Investor page
-      </a>
-    </nav>
-    <main className="container">
-      <div className="pure-g">
-        <div className="pure-u-1-1">
-          <h1>Investor view</h1>
-        </div>
-      </div>
-    </main>
+export const Investor = (props) => (
+  <div className="pure-g">
+    <div className="pure-u-1-1">
+      <h1>Investor view</h1>
+    </div>
   </div>
 )
 
-export default Syndicate
+export default Investor
