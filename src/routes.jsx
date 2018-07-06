@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, BrowserRouter } from 'react-router-dom'
+import { Route, BrowserRouter, Switch } from 'react-router-dom'
 
 import Home from './app/views/home/Home'
 import Syndicate from './app/views/syndicate/Syndicate'
@@ -10,11 +10,11 @@ export const Routes = (props) => {
 
   return (
     <BrowserRouter>
-      <div>
-        <Route path="/" render={render(Home)} />
+      <Switch>
         <Route path="/syndicate" render={render(Syndicate)} />
         <Route path="/investor" render={render(Investor)} />
-      </div>
+        <Route path="/" render={render(Home)} />
+      </Switch>
     </BrowserRouter>
   )
 }

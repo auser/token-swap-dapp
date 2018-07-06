@@ -1,10 +1,20 @@
 import React from 'react'
 
-export const Home = (props) => (
+export const Syndicate = (props) => (
   <div className="App">
-    Investor View
-    {this.props.children}
+    <nav className="navbar pure-menu pure-menu-horizontal">
+      <a href="#" className="pure-menu-heading pure-menu-link">
+        Investor page
+      </a>
+    </nav>
+    <main className="container">
+      <div className="pure-g">
+        <div className="pure-u-1-1">
+          <h1>Investor view</h1>
+        </div>
+      </div>
+    </main>
   </div>
 )
 
-export default Home
+export default Syndicate
