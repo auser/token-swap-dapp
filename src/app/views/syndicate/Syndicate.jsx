@@ -45,11 +45,10 @@ export class Syndicate extends React.Component {
     return (
       <div className="pure-g">
         <div className="pure-u-1-1">
-          <h1>Syndicate view</h1>
           {
             this.state.isWhitelisted ?
               <WhitelistedInstructions {...this.props} />:
-              <NotWhitelisted {...this.props} />
+              <NotWhitelisted checkWhitelisted={this.checkWhitelisted} {...this.props} />
           }
         </div>
       </div>

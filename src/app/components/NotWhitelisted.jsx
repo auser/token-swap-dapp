@@ -13,7 +13,7 @@ export class WhitelistedInstructions extends React.Component {
             </p>
             <pre><code>{this.props.accounts[0]}</code></pre>
             <div className="pure-u-1-1">
-              <button onClick={this.checkWhitelisted}>Check again</button>
+              <button onClick={this.props.checkWhitelisted}>Check again</button>
             </div>
           </div>
         </div>

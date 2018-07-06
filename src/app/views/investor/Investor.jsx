@@ -10,6 +10,21 @@ const InvalidAddress = () => (
     </p>
   </div>
 )
+
+const RequestTransfer = ({ onRequestTransfer }) => {
+  return (
+    <div className="pure-u-1-1">
+      <h1>Request a token transfer</h1>
+      <p>
+        In order to get your exchange of the new tokens, you'll need to register your address. You can do so by clicking on the button below:
+      </p>
+      <button onClick={onRequestTransfer}>
+        Request token transfer
+      </button>
+    </div>
+  )
+}
+
 export class Investor extends React.Component {
 
   constructor(props) {
@@ -31,9 +46,30 @@ export class Investor extends React.Component {
         loaded: true,
         contractFound,
         contractIndex
-      })
+      }, () => this.loadContract())
     })
     .catch(() => this.setState({loaded: false}))
+  }
+
+  loadContract = async () => {
+    const {factory} = this.props
+    const {contractIndex} = this.state
+    const contract = await factory.getContractAtIndex(contractIndex)
+    const contractAddress = contract[1]
+    this.setState({
+      contractAddress
+    })
+  }
+
+  onRequestTransfer = async () => {
+    const {accounts} = this.props;
+    const contract = this.props.SwapContract.at(this.state.contractAddress)
+    // TODO: Check balance of original shopin tokens
+    // and request the transfer with that amount
+    const amount = 100
+    // console.log('account ->', accounts[0])
+    // const evt = await contract.requestTransfer(amount, {from: accounts[0]})
+    // console.log('contract ->', evt)
   }
 
   render() {
@@ -46,9 +82,7 @@ export class Investor extends React.Component {
       <div className="pure-g">
         <div className="pure-u-1-1">
           <h1>Investor view</h1>
-          <pre>
-            {JSON.stringify(contractFound, null, 2)}
-          </pre>
+          <RequestTransfer onRequestTransfer={this.onRequestTransfer} />
         </div>
       </div>
     )

@@ -1,15 +1,18 @@
 import SwapFactory from '../../build/contracts/SwapFactory.json';
+import SwapContract from '../../build/contracts/SwapContract.json';
 import SwapController from '../../build/contracts/SwapController.json';
 import getWeb3 from '../utils/getWeb3';
 
 const contract = require ('truffle-contract');
 const factoryDef = contract (SwapFactory);
 const controllerDef = contract (SwapController)
+const swapContractDef = contract(SwapContract)
 
 const loadContracts = () => new Promise((resolve, reject) => {
   getWeb3.then(({web3}) => {
     factoryDef.setProvider (web3.currentProvider);
     controllerDef.setProvider(web3.currentProvider);
+    swapContractDef.setProvider(web3.currentProvider);
 
     // Get accounts.
     web3.eth.getAccounts (async (error, accounts) => {
@@ -22,6 +25,7 @@ const loadContracts = () => new Promise((resolve, reject) => {
         accounts,
         controller,
         factory,
+        SwapContract: swapContractDef,
         web3
       })
     })

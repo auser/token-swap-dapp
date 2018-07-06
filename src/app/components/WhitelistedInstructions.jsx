@@ -1,9 +1,22 @@
 import React from 'react'
+import {Link} from 'react-router-dom'
 
 const CreateContractInstance = ({onCreate}) => (
   <div className="pure-u-1-1">
     <h1>Create an instance here</h1>
     <button onClick={onCreate}>Create an instance</button>
+  </div>
+)
+
+const ExistingInstance = ({instanceId}) => (
+  <div className="pure-u-1-1">
+    <h2>You have an instance</h2>
+    <p>Send your investors to the following address</p>
+    <pre><code>
+      <Link to={`/investor/${instanceId}`}>
+        /investor/${instanceId}
+      </Link>
+    </code></pre>
   </div>
 )
 
@@ -40,6 +53,8 @@ export class WhitelistedInstructions extends React.Component {
   }
 
   render() {
+    const {accounts} = this.props;
+
     return (
       <div className="App">
         <div className="pure-g">
@@ -47,7 +62,7 @@ export class WhitelistedInstructions extends React.Component {
             <h1>Welcome to the token swap</h1>
             {
               this.state.hasInstance ?
-                <p>You have an instance already</p> :
+                <ExistingInstance instanceId={accounts[0]} /> :
                 <CreateContractInstance onCreate={this.onCreateInstance} />
             }
           </div>
