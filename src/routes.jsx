@@ -25,9 +25,8 @@ export const Routes = (props) => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route path="/syndicate" render={render(Syndicate)} />
-        <Route path="/investor/:id" render={render(Investor)} />
-        <Route path="/" render={render(Home)} />
+        <Route path="/:id" render={render(Investor)} />
+        <Route path="/" render={render(Syndicate)} />
       </Switch>
     </BrowserRouter>
   )
