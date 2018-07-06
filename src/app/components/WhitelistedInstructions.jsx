@@ -3,8 +3,8 @@ import {Link} from 'react-router-dom'
 
 const CreateContractInstance = ({onCreate}) => (
   <div className="pure-u-1-1">
-    <h1>Create an instance here</h1>
-    <button onClick={onCreate}>Create an instance</button>
+    <p>By deploying a smart contract for your syndicate your investors can particpate in the Shopin Token swap.</p>
+    <button className="pure-button" onClick={onCreate}>Deploy Swap Contract</button>
   </div>
 )
 
@@ -59,7 +59,7 @@ export class WhitelistedInstructions extends React.Component {
       <div className="App">
         <div className="pure-g">
           <div className="pure-u-1-1">
-            <h1>Welcome to the token swap</h1>
+            <p>Welcome to the Shopin Token Swap Dapp.</p>
             {
               this.state.hasInstance ?
                 <ExistingInstance instanceId={accounts[0]} /> :

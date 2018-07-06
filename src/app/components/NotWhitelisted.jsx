@@ -9,11 +9,11 @@ export class WhitelistedInstructions extends React.Component {
           <div className="pure-u-1-1">
             <h1>Not whitelisted...</h1>
             <p>
-              If you feel you've reached this in error, contact us and let us know your address: 
+              If you feel you've reached this in error, contact us and let us know your address:
             </p>
             <pre><code>{this.props.accounts[0]}</code></pre>
             <div className="pure-u-1-1">
-              <button onClick={this.props.checkWhitelisted}>Check again</button>
+              <button className="pure-button" onClick={this.props.checkWhitelisted}>Check again</button>
             </div>
           </div>
         </div>

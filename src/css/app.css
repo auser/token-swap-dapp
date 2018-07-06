@@ -4,6 +4,7 @@ body,
 .pure-g [class*=pure-u] {
   font-family: 'Roboto', sans-serif;
   color: #404040;
+  background-color: #f2f9ff;
 }
 
 h1, h2, h3 {
@@ -25,14 +26,6 @@ code {
   box-sizing: border-box;
   width: 100%;
   padding: 80px 25px;
-}
-
-.pure-button-primary {
-  background-color: #0c1a2b;
-}
-
-.pure-button-primary:hover {
-  background-color: #233e5e;
 }
 
 .pure-form input[type="text"]:focus {
@@ -60,6 +53,18 @@ code {
   border: 1px solid white;
   background-image: linear-gradient(to bottom, rgba(255, 255, 255, .44), rgba(255, 255, 255, .22));
   border: solid 1px rgba(254, 254, 254, .4)
+}
+
+button {
+  border: 1px solid #008aff !important;
+  background: transparent !important;
+  color: #008aff !important;
+  border-radius: 4px;
+}
+
+button:hover {
+  background: #008aff !important;
+  color: white !important;
 }
 
 .navbar a:active,
