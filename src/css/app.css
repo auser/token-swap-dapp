@@ -57,17 +57,34 @@ code {
 
 .navbar a {
   color: #fff;
+  border: 1px solid white;
 }
 
 .navbar a:active,
 .navbar a:focus,
 .navbar a:hover {
-  background: #233e5e;
+  border: 1px solid #2d2c92;
+  background: #2d2c92;
+}
+
+.navbar a.logo {
+  border: none !important;
+}
+
+.navbar a.logo:hover {
+  background: none !important;
 }
 
 .navbar .pure-menu-heading {
   font-weight: bold;
   text-transform: none;
+}
+
+.navbar .pure-menu-link {
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-weight: 500;
+  font-size: 15px;
 }
 
 .navbar .navbar-right {

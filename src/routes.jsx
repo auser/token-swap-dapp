@@ -9,7 +9,9 @@ export const Routes = (props) => {
   const render = (Component) => (routerProps) => (
     <div className="App">
       <nav className="navbar pure-menu pure-menu-horizontal">
-        <img className="pure-menu-heading" src="img/logo.svg" />
+        <a className="logo" href="https://shopin.com">
+          <img className="pure-menu-heading" src="img/logo.svg" />
+        </a>
         <a href="#" className="pure-menu-heading pure-menu-link">
           Token Swap
         </a>
