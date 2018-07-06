@@ -58,20 +58,18 @@ code {
 .navbar a {
   color: #fff;
   border: 1px solid white;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, .44), rgba(255, 255, 255, .22));
+  border: solid 1px rgba(254, 254, 254, .4)
 }
 
 .navbar a:active,
 .navbar a:focus,
 .navbar a:hover {
-  border: 1px solid #2d2c92;
-  background: #2d2c92;
+  background: transparent;
 }
 
 .navbar a.logo {
   border: none !important;
-}
-
-.navbar a.logo:hover {
   background: none !important;
 }
 
