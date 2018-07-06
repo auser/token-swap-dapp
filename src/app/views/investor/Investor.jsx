@@ -11,6 +11,14 @@ const InvalidAddress = () => (
   </div>
 )
 
+const Thanks = (props) => (
+  <div className="pure-u-1-1">
+    <h1>Thanks for submitting your request for a token swap.</h1>
+    <p>Your transaction ID is:</p>
+    <pre>{props.completedTxId}</pre>
+  </div>
+)
+
 class RequestTransfer extends React.Component {
   constructor(props) {
     super(props);
@@ -32,7 +40,7 @@ class RequestTransfer extends React.Component {
     const {web3, token} = this.props
     this.setState({transactionHash: value}, () => {
       web3.eth.getTransactionReceipt(value, (err, obj) => {
-        
+
         if (obj) {
           token.Transfer({}, {
             fromBlock: obj.blockNumber,
@@ -58,7 +66,7 @@ class RequestTransfer extends React.Component {
       <div className="pure-u-1-1">
         <h1>Request a token transfer</h1>
         <p>
-          In order to get your exchange of the new tokens, you'll need to register your address. 
+          In order to get your exchange of the new tokens, you'll need to register your address.
         </p>
 
         <p>
@@ -79,7 +87,7 @@ class RequestTransfer extends React.Component {
             We'll send {this.state.amount} SHOPIN tokens to your account {this.state.fromAddress}.
           </div>
           <div className="pure-u-1-1">
-            <input 
+            <input
               value={`Request token transfer for ${this.state.amount} tokens`}
               type="submit"
               disabled={this.state.amount === 0}
@@ -100,7 +108,9 @@ export class Investor extends React.Component {
     this.state = {
       loaded: false,
       contractFound: false,
-      contractIndex: null
+      contractIndex: null,
+      completed: false,
+      completedTxId: null
     }
   }
 
@@ -134,17 +144,16 @@ export class Investor extends React.Component {
     // and request the transfer with that amount
     // console.log('account ->', accounts[0])
     const evt = await contract.requestTransfer(amount, {from: fromAddress})
-    
-    console.log(evt)
-    // this.onRequestTransferComplete(contract, evt)
+    this.setState({completed: true, completedTxId: evt.tx})
   }
 
   render() {
-    const {loaded, contractFound} = this.state;
+    const {loaded, completed, completedTxId, contractFound} = this.state;
 
     if (!loaded) return <Loading />
     if (!contractFound) return <InvalidAddress />
-    
+    if (completed) return <Thanks completed={completed} completedTxId={completedTxId} />
+
     return (
       <div className="pure-g">
         <div className="pure-u-1-1">
