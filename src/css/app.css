@@ -2,11 +2,16 @@
 
 body,
 .pure-g [class*=pure-u] {
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'Roboto', sans-serif;
+  color: #404040;
 }
 
 h1, h2, h3 {
-  font-family: 'Oswald', 'Arial Narrow', sans-serif;
+  font-family: 'Montserrat', sans-serif;
+}
+
+a {
+  color: #008aff;
 }
 
 code {
@@ -19,7 +24,7 @@ code {
 .container {
   box-sizing: border-box;
   width: 100%;
-  padding: 45px 20px;
+  padding: 80px 25px;
 }
 
 .pure-button-primary {
@@ -39,23 +44,47 @@ code {
 .navbar {
   position: fixed;
   padding: 5px;
-  background: #0c1a2b;
-  font-family: 'Oswald', 'Arial Narrow', sans-serif;
+  background-color: #008aff;
+  /* background: linear-gradient(to bottom, #008aff, #baabff); */
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.navbar img {
+  width: 141px;
 }
 
 .navbar a {
   color: #fff;
+  border: 1px solid white;
 }
 
 .navbar a:active,
 .navbar a:focus,
 .navbar a:hover {
-  background: #233e5e;
+  border: 1px solid #2d2c92;
+  background: #2d2c92;
+}
+
+.navbar a.logo {
+  border: none !important;
+}
+
+.navbar a.logo:hover {
+  background: none !important;
 }
 
 .navbar .pure-menu-heading {
   font-weight: bold;
   text-transform: none;
+}
+
+.navbar .pure-menu-link {
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-weight: 500;
+  font-size: 15px;
 }
 
 .navbar .navbar-right {

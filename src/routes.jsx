@@ -9,9 +9,12 @@ export const Routes = (props) => {
   const render = (Component) => (routerProps) => (
     <div className="App">
       <nav className="navbar pure-menu pure-menu-horizontal">
-        <Link to="/" className="pure-menu-heading pure-menu-link">
-          Shopin token swap
-        </Link>
+        <a className="logo" href="https://shopin.com">
+          <img className="pure-menu-heading" src="img/logo.svg" />
+        </a>
+        <a href="#" className="pure-menu-heading pure-menu-link">
+          Token Swap
+        </a>
       </nav>
       <main className="container">
         <Component {...routerProps} {...props} />
