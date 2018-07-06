@@ -1,8 +1,9 @@
 import React from 'react'
 
-const CreateContractInstance = (props) => (
+const CreateContractInstance = ({onCreate}) => (
   <div className="pure-u-1-1">
     <h1>Create an instance here</h1>
+    <button onClick={onCreate}>Create an instance</button>
   </div>
 )
 
@@ -17,6 +18,10 @@ export class WhitelistedInstructions extends React.Component {
   }
 
   componentWillMount() {
+    this.contractNameExists()
+  }
+
+  contractNameExists = async () => {
     const {accounts, factory} = this.props;
 
     factory.contractByNameExists(accounts[0])
@@ -28,8 +33,10 @@ export class WhitelistedInstructions extends React.Component {
     }))
   }
 
-  onCreateInstance = () => {
-    console.log('yay')
+  onCreateInstance = async () => {
+    const {accounts, factory} = this.props;
+    await factory.insertContract(`${accounts[0]}`, {from: accounts[0]})
+    this.contractNameExists()
   }
 
   render() {

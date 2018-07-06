@@ -17,15 +17,21 @@ class App extends Component {
     };
   }
 
-  componentDidMount() {
-    const {accounts, controller} = this.props
+  componentWillMount() {
+    const {accounts} = this.props
     if (!accounts || accounts.length === 0) {
       this.setState({
         ready: true,
         hasAccount: false
       })
     } else {
-      controller.isWhitelisted(`${accounts[0]}`)
+      this.checkWhitelisted()
+    }
+  }
+
+  checkWhitelisted = () => {
+    const {accounts, controller} = this.props;
+    controller.isWhitelisted(`${accounts[0]}`)
       .then(isWhitelisted => {
         this.setState({
           ready: true,
@@ -33,7 +39,6 @@ class App extends Component {
           isWhitelisted
         })
       })
-    }
   }
 
   render () {
