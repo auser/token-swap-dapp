@@ -13,10 +13,6 @@ export class WhitelistedInstructions extends React.Component {
               investor, your syndicate lead will share a unique link that you
               can use to claim your new SHOPIN tokens.
             </p>
-            <pre><code>{this.props.accounts[0]}</code></pre>
-            <div className="pure-u-1-1">
-              <button className="pure-button" onClick={this.props.checkWhitelisted}>Check again</button>
-            </div>
           </div>
         </div>
       </div>

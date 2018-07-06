@@ -47,8 +47,8 @@ export class Syndicate extends React.Component {
         <div className="pure-u-1-1">
           {
             this.state.isWhitelisted ?
-              <WhitelistedInstructions {...this.props} />:
-              <NotWhitelisted checkWhitelisted={this.checkWhitelisted} {...this.props} />
+              <WhitelistedInstructions checkWhitelisted={this.checkWhitelisted} {...this.props} />:
+              <NotWhitelisted {...this.props} />
           }
         </div>
       </div>

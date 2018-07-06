@@ -1,3 +1,4 @@
+import ERC20 from '../../build/contracts/ERC20.json'
 import SwapFactory from '../../build/contracts/SwapFactory.json';
 import SwapContract from '../../build/contracts/SwapContract.json';
 import SwapController from '../../build/contracts/SwapController.json';
@@ -7,24 +8,28 @@ const contract = require ('truffle-contract');
 const factoryDef = contract (SwapFactory);
 const controllerDef = contract (SwapController)
 const swapContractDef = contract(SwapContract)
+const tokenContractDef = contract(ERC20)
 
 const loadContracts = () => new Promise((resolve, reject) => {
   getWeb3.then(({web3}) => {
     factoryDef.setProvider (web3.currentProvider);
     controllerDef.setProvider(web3.currentProvider);
     swapContractDef.setProvider(web3.currentProvider);
+    tokenContractDef.setProvider(web3.currentProvider)
 
     // Get accounts.
     web3.eth.getAccounts (async (error, accounts) => {
-      const [controller, factory] = await Promise.all([
+      const [controller, factory, token] = await Promise.all([
         controllerDef.at(process.env.REACT_APP_CONTROLLER_ADDRESS),
-        factoryDef.at(process.env.REACT_APP_FACTORY_ADDRESS)
+        factoryDef.at(process.env.REACT_APP_FACTORY_ADDRESS),
+        tokenContractDef.at(process.env.REACT_APP_TOKEN_ADDRESS),
       ])
 
       resolve({
         accounts,
         controller,
         factory,
+        token,
         SwapContract: swapContractDef,
         web3
       })

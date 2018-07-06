@@ -11,18 +11,85 @@ const InvalidAddress = () => (
   </div>
 )
 
-const RequestTransfer = ({ onRequestTransfer }) => {
-  return (
-    <div className="pure-u-1-1">
-      <h1>Request a token transfer</h1>
-      <p>
-        In order to get your exchange of the new tokens, you'll need to register your address. You can do so by clicking on the button below:
-      </p>
-      <button onClick={onRequestTransfer}>
-        Request token transfer
-      </button>
-    </div>
-  )
+class RequestTransfer extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      transactionHash: '',
+      amount: 0,
+      fromAddress: null
+    }
+  }
+
+  handleSubmit = (evt) => {
+    evt.preventDefault();
+    this.props.onRequestTransfer(this.state.fromAddress, this.state.amount);
+  }
+
+  onUpdated = (evt) => {
+    const value = evt.target.value;
+    const {web3, token} = this.props
+    this.setState({transactionHash: value}, () => {
+      web3.eth.getTransactionReceipt(value, (err, obj) => {
+        
+        if (obj) {
+          token.Transfer({}, {
+            fromBlock: obj.blockNumber,
+            toBlock: obj.blockNumber + 1
+          }, (err, res) => {
+            if (!err) {
+              const {args} = res
+              const fromAddress = args.from;
+              const amount = args.value.toNumber()
+              this.setState({amount, fromAddress})
+            }
+          })
+        } else {
+          this.setState({amount: 0})
+        }
+      })
+    })
+  }
+
+
+  render() {
+    return (
+      <div className="pure-u-1-1">
+        <h1>Request a token transfer</h1>
+        <p>
+          In order to get your exchange of the new tokens, you'll need to register your address. 
+        </p>
+
+        <p>
+          Fill in your transaction hash from the transfer of your `SHOP` tokens here:
+        </p>
+
+        <div className="pure-u-1-1">
+          <form onSubmit={this.handleSubmit}>
+          <div className="pure-u-1-1">
+            <input
+              onChange={this.onUpdated}
+              ref={r => this.inputRef = r}
+              style={{width: '100%', padding: 10}}
+              placeholder={'Your transaction hash, i.e. 0x...'}
+              />
+          </div>
+          <div className="pure-u-1-1">
+            We'll send {this.state.amount} SHOPIN tokens to your account {this.state.fromAddress}.
+          </div>
+          <div className="pure-u-1-1">
+            <input 
+              value={`Request token transfer for ${this.state.amount} tokens`}
+              type="submit"
+              disabled={this.state.amount === 0}
+              className="pure-button" />
+          </div>
+          </form>
+        </div>
+      </div>
+    )
+  }
 }
 
 export class Investor extends React.Component {
@@ -61,15 +128,15 @@ export class Investor extends React.Component {
     })
   }
 
-  onRequestTransfer = async () => {
-    const {accounts} = this.props;
+  onRequestTransfer = async (fromAddress, amount) => {
     const contract = this.props.SwapContract.at(this.state.contractAddress)
     // TODO: Check balance of original shopin tokens
     // and request the transfer with that amount
-    const amount = 100
     // console.log('account ->', accounts[0])
-    // const evt = await contract.requestTransfer(amount, {from: accounts[0]})
-    // console.log('contract ->', evt)
+    const evt = await contract.requestTransfer(amount, {from: fromAddress})
+    
+    console.log(evt)
+    // this.onRequestTransferComplete(contract, evt)
   }
 
   render() {
@@ -81,8 +148,7 @@ export class Investor extends React.Component {
     return (
       <div className="pure-g">
         <div className="pure-u-1-1">
-          <h1>Investor view</h1>
-          <RequestTransfer onRequestTransfer={this.onRequestTransfer} />
+          <RequestTransfer onRequestTransfer={this.onRequestTransfer} {...this.props} />
         </div>
       </div>
     )
