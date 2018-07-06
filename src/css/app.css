@@ -71,6 +71,8 @@ code {
   border: none !important;
 }
 
+.navbar a.logo:active,
+.navbar a.logo:focus,
 .navbar a.logo:hover {
   background: none !important;
 }
