@@ -3,7 +3,7 @@ pragma solidity 0.4.24;
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./SwapContract.sol";
 
-contract SwapContractFactory is Ownable {
+contract SwapFactory is Ownable {
 
   address public tokenAddress;
   address public controllerAddress;

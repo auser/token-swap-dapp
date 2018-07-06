@@ -1,20 +1,25 @@
 pragma solidity 0.4.24;
 
 import "hanzo-solidity/contracts/Blacklist.sol";
+import "hanzo-solidity/contracts/Whitelist.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
+contract SwapController is Ownable, Pausable {
+    Blacklist private blacklist;
+    Whitelist private whitelist;
 
-contract SwapController is Blacklist, Pausable {
     event SwapEnabled();
     event SwapDisabled();
 
-    constructor() public {
-        owner = msg.sender;
+    constructor() public Ownable() {
+        blacklist = new Blacklist();
+        whitelist = new Whitelist();
+        pause();
     }
 
-    function swapEnabled() public view onlyOwner returns (bool) {
+    function swapEnabled() public view returns (bool) {
         return !paused;
     }
 
@@ -29,6 +34,26 @@ contract SwapController is Blacklist, Pausable {
     }
 
     function canSwap(address addr) public view returns (bool) {
-        return swapEnabled() && !isBlacklisted(addr);
+        return swapEnabled() && !blacklist.isBlacklisted(addr);
+    }
+
+    function addToWhitelist(address addr) public onlyOwner {
+        whitelist.addToWhitelist(addr);
+    }
+
+    function removeFromWhitelist(address addr) public onlyOwner {
+        whitelist.removeFromWhitelist(addr);
+    }
+
+    function isWhitelisted(address addr) public view returns (bool) {
+        return whitelist.isWhitelisted(addr);
+    }
+
+    function addToBlacklist(address addr) public onlyOwner {
+        blacklist.addToBlacklist(addr);
+    }
+
+    function removeFromBlacklist(address addr) public onlyOwner {
+        blacklist.removeFromBlacklist(addr);
     }
 }

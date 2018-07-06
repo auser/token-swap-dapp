@@ -1,8 +1,11 @@
 pragma solidity 0.4.24;
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
-import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+
+import "./SwapController.sol";
+
 
 contract SwapContract is Ownable {
     using SafeMath for uint256;
@@ -13,7 +16,7 @@ contract SwapContract is Ownable {
     struct TransferRequest {
         address investor;
         uint256 amount;
-        bool approved;
+        bool completed;
         uint index;
     }
 
@@ -22,7 +25,7 @@ contract SwapContract is Ownable {
     mapping (uint => TransferRequest) _requests;
 
     event RequestToTransfer(uint numRequests);
-    event TransferExecuted(uint index, address indexed investor, uint256 amount);
+    event TransferExecuted(uint idx, address indexed investor, uint256 amount);
 
     /**
      * @dev only the token owner and owner of the contract
@@ -82,21 +85,35 @@ contract SwapContract is Ownable {
       return true;
     }
 
+    /**
+     * @dev can the transfer request get swapped?
+     * @param req TransferRequest we're checking on
+     * @return bool if the transfer request can be executed
+     */
+    function canSwap(TransferRequest req) internal view returns (bool) {
+        SwapController controller = SwapController(controllerTokenAddress);
+        return controller.canSwap(req.investor);
+    }
+
+    /**
+     * @dev execute transfers for all unexecuted ones that can be swapped
+     * @return boolean if the entire operation completed successfully or not
+     */
     function executeTransfers()
         onlyTokenOwner
         public
         returns (bool)
     {
         if (_numRequests == 0) return false;
+        uint numRequests = _numRequests;
         ERC20 token = ERC20(tokenAddress);
-        uint numRequests = 1; //_numRequests;
         for (uint i = 0; i < numRequests; i++) {
             TransferRequest storage req = _requests[i];
-            if (!req.approved) {
+            if (!req.completed && canSwap(req)) {
                 // Execute transfer
                 token.transfer(req.investor, req.amount);
                 emit TransferExecuted(i, req.investor, req.amount);
-                _requests[i].approved = true;
+                _requests[i].completed = true;
             }
         }
         return true;
@@ -166,12 +183,32 @@ contract SwapContract is Ownable {
       return _requests[idx].investor;
     }
 
+
+    // function executeRequestTransfer(
+    //     uint idx
+    // )
+    //     onlyTokenOwner
+    //     public
+    //     returns (bool)
+    // {
+    //     ERC20 token = ERC20(tokenAddress);
+    //     TransferRequest storage req = _requests[idx];
+    //     if (!req.completed) {
+    //         // Execute transfer
+    //          ERC20Basic(tokenAddress);
+    //         token.transfer(req.investor, req.amount);
+    //         emit TransferExecuted(req.investor, req.amount);
+    //         _requests[idx].completed = true;
+    //     }
+    //     return true;
+    // }
+
     /**
-     * @dev get the approval status of the transfer request
+     * @dev get the completed status of the transfer request
      * @param idx the index of the transfer request
-     * @return bool the status of the approved transfer request
+     * @return bool the status of the completed transfer request
      */
-    function getTransferRequestApproval(
+    function getTransferRequestCompleted(
         uint idx
     )
         onlyTokenOwner
@@ -179,7 +216,7 @@ contract SwapContract is Ownable {
         view
         returns (bool)
     {
-        return _requests[idx].approved;
+        return _requests[idx].completed;
     }
 
     /**
