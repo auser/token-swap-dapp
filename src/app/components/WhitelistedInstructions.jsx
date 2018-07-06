@@ -36,7 +36,7 @@ export class WhitelistedInstructions extends React.Component {
   onCreateInstance = async () => {
     const {accounts, factory} = this.props;
     await factory.insertContract(`${accounts[0]}`, {from: accounts[0]})
-    this.contractNameExists()
+    await this.contractNameExists()
   }
 
   render() {
