@@ -41,11 +41,6 @@ const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, isReady}
   </div>
 );
 
-const ExecuteTransfers = (props) => {
-  return (
-  )
-}
-
 export class WhitelistedInstructions extends React.Component {
   constructor (props) {
     super (props);
