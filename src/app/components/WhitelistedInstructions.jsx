@@ -12,8 +12,9 @@ const CreateContractInstance = ({checkWhitelisted, accounts, onCreate}) => (
       onClick={onCreate}>
         Deploy Swap Contract
     </button>
-    <button
+    <button disabled
       className="pure-button"
+      style={{marginLeft: '15px'}}
       onClick={onCreate}>
         Swap Tokens
     </button>
@@ -34,9 +35,9 @@ const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, isReady}
       </code>
     </pre>
     <button
-      disabled={!hasInstance && isReady}
-      className="pure-button">
-        Execute transactions (enabled when ready)
+      disabled={!isReady}
+      className="pure-button swap-button">
+        Swap Tokens
     </button>
   </div>
 );
