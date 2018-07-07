@@ -1,6 +1,7 @@
 import React from 'react'
 // import { Link } from 'react-router-dom'
 import Loading from '../../components/Loading'
+import PrintReceipt from '../../components/PrintReceipt'
 
 const InvalidAddress = () => (
   <div className="pure-u-1-1">
@@ -16,6 +17,7 @@ const Thanks = (props) => (
     <h1>Thanks for submitting your request for a token swap.</h1>
     <p>Your transaction ID is:</p>
     <pre>{props.completedTxId}</pre>
+    <PrintReceipt {...props} />
   </div>
 )
 
@@ -110,7 +112,8 @@ export class Investor extends React.Component {
       contractFound: false,
       contractIndex: null,
       completed: false,
-      completedTxId: null
+      completedTxId: null,
+      completedTransaction: null
     }
   }
 
@@ -144,7 +147,7 @@ export class Investor extends React.Component {
     // and request the transfer with that amount
     // console.log('account ->', accounts[0])
     const evt = await contract.requestTransfer(amount, {from: fromAddress})
-    this.setState({completed: true, completedTxId: evt.tx})
+    this.setState({completed: true, completedTxId: evt.tx, completedTransaction: evt})
   }
 
   render() {
