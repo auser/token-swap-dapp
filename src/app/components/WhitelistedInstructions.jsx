@@ -12,12 +12,17 @@ const CreateContractInstance = ({checkWhitelisted, accounts, onCreate}) => (
       onClick={onCreate}>
         Deploy Swap Contract
     </button>
+    <button
+      className="pure-button"
+      onClick={onCreate}>
+        Swap Tokens
+    </button>
     <h3>Your account</h3>
     <code>{accounts[0]}</code>
   </div>
 );
 
-const ExistingInstance = ({instanceId}) => (
+const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, isReady}) => (
   <div className="pure-u-1-1">
     <h2>You have an instance</h2>
     <p>Send your investors to the following address</p>
@@ -28,8 +33,18 @@ const ExistingInstance = ({instanceId}) => (
         </Link>
       </code>
     </pre>
+    <button
+      disabled={!hasInstance && isReady}
+      className="pure-button">
+        Execute transactions (enabled when ready)
+    </button>
   </div>
 );
+
+const ExecuteTransfers = (props) => {
+  return (
+  )
+}
 
 export class WhitelistedInstructions extends React.Component {
   constructor (props) {
@@ -41,8 +56,9 @@ export class WhitelistedInstructions extends React.Component {
     };
   }
 
-  componentWillMount () {
-    this.contractNameExists ();
+  componentWillMount() {
+    this.contractNameExists()
+    this.props.controller.swapEnabled().then(b => this.setState({swapEnabled: b}))
   }
 
   contractNameExists = async () => {
@@ -61,7 +77,7 @@ export class WhitelistedInstructions extends React.Component {
   };
 
   afterContractCreation = async () => {
-    await this.contractNameExists ();
+    await this.contractNameExists();
     if (!this.state.hasInstance) {
       setTimeout (this.afterContractCreation, 1000);
     }
@@ -74,7 +90,13 @@ export class WhitelistedInstructions extends React.Component {
     await this.afterContractCreation ();
   };
 
-  render () {
+  onExecuteTransfers = async (evt) => {
+    evt.preventDefault()
+    const contract = this.props.SwapContract.at(this.state.contractAddress)
+    await contract.executeTranser()
+  }
+
+  render() {
     const {accounts} = this.props;
 
     return (
@@ -83,7 +105,11 @@ export class WhitelistedInstructions extends React.Component {
           <div className="pure-u-1-1">
             {
               this.state.hasInstance ?
-                <ExistingInstance instanceId={accounts[0]} /> :
+                <ExistingInstance
+                  instanceId={accounts[0]}
+                  onExecuteTransfers={this.onExecuteTransfers}
+                  hasInstance={this.props.hasInstance}
+                  isReady={this.props.isReady} /> :
                 <CreateContractInstance
                   accounts={accounts}
                   checkWhitelisted={this.props.checkWhitelisted}
