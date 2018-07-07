@@ -50,9 +50,6 @@ code {
 
 .navbar a {
   color: #fff;
-  border: 1px solid white;
-  background-image: linear-gradient(to bottom, rgba(255, 255, 255, .44), rgba(255, 255, 255, .22));
-  border: solid 1px rgba(254, 254, 254, .4)
 }
 
 button {
@@ -84,7 +81,6 @@ button:hover {
 }
 
 .navbar .pure-menu-link {
-  border-radius: 4px;
   padding: 8px 12px;
   font-weight: 500;
   font-size: 15px;

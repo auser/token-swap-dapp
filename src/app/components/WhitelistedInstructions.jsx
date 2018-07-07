@@ -7,11 +7,13 @@ const CreateContractInstance = ({checkWhitelisted, accounts, onCreate}) => (
     <p>
       By deploying a smart contract for your syndicate your investors can particpate in the Shopin Token swap.
     </p>
-    <button className="pure-button" onClick={onCreate}>
-      Deploy Swap Contract
+    <button
+      className="pure-button"
+      onClick={onCreate}>
+        Deploy Swap Contract
     </button>
     <h3>Your account</h3>
-    <pre><code>{accounts[0]}</code></pre>
+    <code>{accounts[0]}</code>
   </div>
 );
 
@@ -79,10 +81,10 @@ export class WhitelistedInstructions extends React.Component {
       <div className="App">
         <div className="pure-g">
           <div className="pure-u-1-1">
-            <p>Welcome to the Shopin Token Swap Dapp.</p>
-            {this.state.hasInstance
-              ? <ExistingInstance instanceId={accounts[0]} />
-              : <CreateContractInstance
+            {
+              this.state.hasInstance ?
+                <ExistingInstance instanceId={accounts[0]} /> :
+                <CreateContractInstance
                   accounts={accounts}
                   checkWhitelisted={this.props.checkWhitelisted}
                   onCreate={this.onCreateInstance}
