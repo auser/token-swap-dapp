@@ -77,9 +77,6 @@ factory = SwapFactory.at(REACT_APP_FACTORY_ADDRESS)
 
 factory.getContractCount()
 ```
-<<<<<<< HEAD
-=======
-
 ## FAQ
 
 * __How do I use this with the EthereumJS TestRPC?__
@@ -121,4 +118,3 @@ token swap in a collaboration between [Hanzo][hanzo] and [Shishito][shishito].
 [license-url]:      https://github.com/auser/token-swap-dapp/blob/master/LICENSE
 [npm-img]:          https://img.shields.io/npm/v/token-swap-dapp.svg
 [npm-url]:          https://www.npmjs.com/package/token-swap-dapp
->>>>>>> 0d6e76e416a9798dff059c0163a4cff5856105a2
