@@ -9,9 +9,9 @@ export class WhitelistedInstructions extends React.Component {
           <div className="pure-u-1-1">
             <h1>Welcome</h1>
             <p>
-              Thank you for participating in Shopin's Token Swap. If you are an
-              investor, your syndicate lead will share a unique link that you
-              can use to claim your new SHOPIN tokens.
+              Thank you for participating in Shopin's Token Sale! If you are a
+              member of a syndicate, contact your syndicate for instructions on how you
+              claim your new SHOPIN tokens.
             </p>
           </div>
         </div>
