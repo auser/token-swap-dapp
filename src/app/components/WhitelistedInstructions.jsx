@@ -6,9 +6,9 @@ const CreateContractInstance = ({checkWhitelisted, accounts, onCreate}) => (
     <h3>Deploy your collection contract</h3>
     <p>
       Deploy a token swap smart contract for your syndicate to enable members
-      of your group to register interest in the Shopin token swap. After deploying
-      your unique swap contract, you will be able to distribute SHOPIN tokens to
-      members of your group that have registered interest in the Shopin token swap.
+      of your group to claim their SHOPIN tokens. After deploying your unique swap
+      contract, make sure to share your unique URL so that members of your group
+      can claim their new SHOPIN tokens.
     </p>
     <button
       className="pure-button"
