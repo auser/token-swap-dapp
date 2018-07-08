@@ -297,7 +297,6 @@ detect(DEFAULT_PORT).then(port => {
   }
 
   if (isInteractive) {
-    clearConsole();
     var existingProcess = getProcessForPort(DEFAULT_PORT);
     var question =
       chalk.yellow('Something is already running on port ' + DEFAULT_PORT + '.' +
