@@ -28,15 +28,26 @@ const CreateContractInstance = ({checkWhitelisted, accounts, onCreate}) => (
 
 const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, isReady}) => (
   <div className="pure-u-1-1">
-    <h2>You have an instance</h2>
-    <p>Send your investors to the following address</p>
-    <pre>
-      <code>
-        <Link to={`/${instanceId}`}>
-          /{instanceId}
-        </Link>
-      </code>
-    </pre>
+    <h2>Token swap contract deployed</h2>
+
+    <p>
+      Ensure members of your group visit your unique Dapp URL to claim their
+      SHOPIN tokens. After verifiying the return of your groups SHOP tokens, Shopin
+      will enable distribution of SHOPIN to your group.
+    </p>
+    <p>
+      Thank you for your patience while we verify transactions and ensure the
+      integrity of the Shopin community.
+    </p>
+
+    <h3>Link for your syndicate:</h3>
+    <code>
+      <Link to={`/${instanceId}`}>
+        https://swap.shopin.com/{instanceId}
+      </Link>
+    </code>
+
+    <h3>Distribute SHOPIN tokens:</h3>
     <button
       disabled={!isReady}
       className="pure-button swap-button">
