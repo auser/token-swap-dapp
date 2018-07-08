@@ -5,7 +5,10 @@ const CreateContractInstance = ({checkWhitelisted, accounts, onCreate}) => (
   <div className="pure-u-1-1">
     <h3>Deploy your collection contract</h3>
     <p>
-      By deploying a smart contract for your syndicate your investors can particpate in the Shopin Token swap.
+      Deploy a token swap smart contract for your syndicate to enable members
+      of your group to register interest in the Shopin token swap. After deploying
+      your unique swap contract, you will be able to distribute SHOPIN tokens to
+      members of your group that have registered interest in the Shopin token swap.
     </p>
     <button
       className="pure-button"
