@@ -63,39 +63,42 @@ class RequestTransfer extends React.Component {
     })
   }
 
-
   render() {
     return (
       <div className="pure-u-1-1">
         <h1>Request a token transfer</h1>
         <p>
-          In order to get your exchange of the new tokens, you'll need to register your address.
+          In order to receive SHOPIN tokens, you'll need to send your SHOP tokens to the following Ethereum address:
         </p>
 
         <p>
-          Fill in your transaction hash from the transfer of your `SHOP` tokens here:
+          <code>
+          {this.props.accounts[0]}
+          </code>
+        </p>
+
+        <p>
+          Fill in your transaction hash from the transfer of your SHOP tokens here:
         </p>
 
         <div className="pure-u-1-1">
           <form onSubmit={this.handleSubmit}>
-          <div className="pure-u-1-1">
-            <input
-              onChange={this.onUpdated}
-              ref={r => this.inputRef = r}
-              style={{width: '100%', padding: 10}}
-              placeholder={'Your transaction hash, i.e. 0x...'}
-              />
-          </div>
-          <div className="pure-u-1-1">
-            We'll send {this.state.amount} SHOPIN tokens to your account {this.state.fromAddress}.
-          </div>
-          <div className="pure-u-1-1">
-            <input
-              value={`Request token transfer for ${this.state.amount} tokens`}
-              type="submit"
-              disabled={this.state.amount === 0}
-              className="pure-button" />
-          </div>
+            <div className="pure-u-1-1">
+              <input
+                onChange={this.onUpdated}
+                ref={r => this.inputRef = r}
+                style={{width: '100%', padding: 10}}
+                placeholder={'Your transaction hash, i.e. 0x...'}
+                />
+            </div>
+
+            <p>
+              <input
+                value={`Claim ${this.state.amount} SHOPIN tokens`}
+                type="submit"
+                disabled={this.state.amount === 0}
+                className="pure-button" />
+            </p>
           </form>
         </div>
       </div>
