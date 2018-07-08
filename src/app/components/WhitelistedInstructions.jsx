@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 
-const CreateContractInstance = ({checkWhitelisted, accounts, onCreate}) => (
+const CreateContractInstance = ({checkWhitelisted, deploying, accounts, onCreate}) => (
   <div className="pure-u-1-1">
     <h3>Deploy your collection contract</h3>
     <p>
@@ -10,11 +10,15 @@ const CreateContractInstance = ({checkWhitelisted, accounts, onCreate}) => (
       contract, make sure to share your unique URL so that members of your group
       can claim their new SHOPIN tokens.
     </p>
-    <button
+    {deploying ?
+      <span>Deploying</span> :
+      <button
       className="pure-button"
+      disabled={deploying}
       onClick={onCreate}>
-        Deploy Swap Contract
-    </button>
+      Deploy Swap Contract
+      </button>
+    }
     <button disabled
       className="pure-button"
       style={{marginLeft: '15px'}}
@@ -63,6 +67,7 @@ export class WhitelistedInstructions extends React.Component {
     this.state = {
       ready: false,
       hasInstance: false,
+      deploying: false
     };
   }
 
@@ -82,6 +87,7 @@ export class WhitelistedInstructions extends React.Component {
         this.setState ({
           ready: true,
           hasInstance,
+          deploying: false
         })
       );
   };
@@ -96,8 +102,12 @@ export class WhitelistedInstructions extends React.Component {
   onCreateInstance = async evt => {
     evt.preventDefault ();
     const {accounts, factory} = this.props;
-    await factory.insertContract (`${accounts[0]}`, {from: accounts[0]});
-    await this.afterContractCreation ();
+    this.setState({
+      deploying: true
+    }, async () => {
+      await factory.insertContract (`${accounts[0]}`, {from: accounts[0]});
+      await this.afterContractCreation ();
+    })
   };
 
   onExecuteTransfers = async (evt) => {
@@ -124,6 +134,7 @@ export class WhitelistedInstructions extends React.Component {
                   accounts={accounts}
                   checkWhitelisted={this.props.checkWhitelisted}
                   onCreate={this.onCreateInstance}
+                  deploying={this.state.deploying}
                 />}
           </div>
         </div>

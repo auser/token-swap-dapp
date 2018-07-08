@@ -84,6 +84,7 @@ module.exports = {
   module: {
     // First, run the linter.
     // It's important to do this before Babel processes the JS.
+    noParse: /node_modules\/jspdf\/dist\/jspdf\.min\.js/,
     preLoaders: [
       {
         test: /\.(js|jsx)$/,
