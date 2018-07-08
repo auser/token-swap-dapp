@@ -10,8 +10,8 @@ export class WhitelistedInstructions extends React.Component {
             <h1>Welcome</h1>
             <p>
               Thank you for participating in Shopin's Token Sale! If you are a
-              member of a syndicate, contact your syndicate for instructions on how you
-              claim your new SHOPIN tokens.
+                member of a syndicate, contact your group for instructions on how to
+                claim your new SHOPIN tokens.
             </p>
           </div>
         </div>
