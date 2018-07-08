@@ -14,7 +14,7 @@ const InvalidAddress = () => (
 
 const Thanks = (props) => (
   <div className="pure-u-1-1">
-    <h1>Thanks for submitting your request for a token swap.</h1>
+    <h1>Thank you for claiming your SHOPIN Tokens</h1>
     <p>Your transaction ID is:</p>
     <pre>{props.completedTxId}</pre>
     <PrintReceipt transaction={props.completedTransaction} {...props} />
@@ -68,8 +68,8 @@ class RequestTransfer extends React.Component {
       <div className="pure-u-1-1">
         <h1>Claim SHOPIN tokens</h1>
         <p>
-          In order to receive SHOPIN tokens, you'll need to send your SHOP
-          tokens to the following Ethereum address:
+          In order to receive SHOPIN Tokens, you'll need to send your SHOP
+          Tokens to the following Ethereum address:
         </p>
 
         <p>

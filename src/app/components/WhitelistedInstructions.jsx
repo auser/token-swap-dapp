@@ -5,10 +5,10 @@ const CreateContractInstance = ({checkWhitelisted, deploying, accounts, onCreate
   <div className="pure-u-1-1">
     <h3>Deploy a contract for your syndicate</h3>
     <p>
-      Deploy a token swap smart contract for your syndicate to enable members
+      Deploy a Token Swap Smart Contract for your syndicate to enable members
       of your group to claim their SHOPIN tokens. After deploying your unique swap
       contract, make sure to share your unique URL so that members of your group
-      can claim their new SHOPIN tokens.
+      can claim their new SHOPIN Tokens.
     </p>
     {deploying ?
       <span>Deploying</span> :
@@ -25,6 +25,7 @@ const CreateContractInstance = ({checkWhitelisted, deploying, accounts, onCreate
       onClick={onCreate}>
         Swap Tokens
     </button>
+
     <h3>Your account</h3>
     <code>{accounts[0]}</code>
   </div>
@@ -35,9 +36,11 @@ const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, isReady}
     <h2>Token swap contract deployed</h2>
 
     <p>
-      Ensure members of your group visit your unique Dapp URL to claim their
-      SHOPIN tokens. After verifiying the return of your groups SHOP tokens, Shopin
-      will enable distribution of SHOPIN to your group.
+      Please ensure that members of your group visit your unique
+      <Link to={`/${instanceId}`}>DApp URL</Link> to claim their
+      SHOPIN Tokens. After verifying the return of your syndicate
+      participants’ SHOP tokens, Shopin will enable the distribution
+      of SHOPIN Tokens to your group.
     </p>
     <p>
       Thank you for your patience while we verify transactions and ensure the

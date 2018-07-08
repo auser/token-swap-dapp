@@ -9,11 +9,16 @@ export class WhitelistedInstructions extends React.Component {
           <div className="pure-u-1-1">
             <h1>Welcome</h1>
             <p>
-              Thank you for participating in Shopin's Token Sale! If you are a
-                member of a syndicate, contact your group for instructions on how to
-                claim your new SHOPIN tokens.
+              If you are a syndicate lead, please ensure that your active
+              address in Metamask is whitelisted and that it is connected to Mainnet.
             </p>
-            <button onClick={this.props.checkWhitelisted}>Check</button>
+
+            <p>
+              If you are a member of a syndicate, contact your group for
+              instructions on how to claim your new SHOPIN Tokens.
+            </p>
+
+            <button onClick={this.props.checkWhitelisted}>Check account</button>
           </div>
         </div>
       </div>
