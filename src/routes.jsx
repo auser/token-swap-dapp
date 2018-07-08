@@ -4,7 +4,7 @@ import {Route, BrowserRouter, Switch} from 'react-router-dom';
 // import Home from './app/views/home/Home';
 import Syndicate from './app/views/syndicate/Syndicate';
 import Investor from './app/views/investor/Investor';
-import Printing from './app/views/printing/Printing';
+import BulkInvestor from './app/views/investor/BulkInvestor'
 
 export const Routes = props => {
   const render = Component => routerProps => (
@@ -30,7 +30,7 @@ export const Routes = props => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route path="/print-test" render={render (Printing)} />
+        <Route path="/:id/bulk" render={render (BulkInvestor)} />
         <Route path="/:id" render={render (Investor)} />
         <Route path="/" render={render (Syndicate)} />
       </Switch>

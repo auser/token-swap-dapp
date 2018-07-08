@@ -1,8 +1,7 @@
-import React from 'react'
+import React from 'react';
 
 export class WhitelistedInstructions extends React.Component {
-
-  render() {
+  render () {
     return (
       <div className="App">
         <div className="pure-g">
@@ -10,15 +9,17 @@ export class WhitelistedInstructions extends React.Component {
             <h1>Welcome</h1>
             <p>
               Thank you for participating in Shopin's Token Sale! If you are a
-                member of a syndicate, contact your group for instructions on how to
-                claim your new SHOPIN tokens.
+              member of a syndicate, contact your group for instructions on how to
+              claim your new SHOPIN tokens.
             </p>
-            <button onClick={this.props.checkWhitelisted}>Check</button>
+            <button onClick={this.props.checkWhitelisted}>
+              Check if whitelisted
+            </button>
           </div>
         </div>
       </div>
-    )
+    );
   }
 }
 
-export default WhitelistedInstructions
+export default WhitelistedInstructions;

@@ -1,11 +1,10 @@
-import React from 'react'
+import React from 'react';
 // import { Link } from 'react-router-dom'
 
-import WhitelistedInstructions from '../../components/WhitelistedInstructions'
-import NotWhitelisted from '../../components/NotWhitelisted'
+import WhitelistedInstructions from '../../components/WhitelistedInstructions';
+import NotWhitelisted from '../../components/NotWhitelisted';
 
 export class Syndicate extends React.Component {
-
   constructor (props) {
     super (props);
 
@@ -13,47 +12,50 @@ export class Syndicate extends React.Component {
       web3: null,
       ready: false,
       isWhitelisted: false,
-      hasAccount: false
+      hasAccount: false,
     };
   }
 
-  componentWillMount() {
-    const {accounts} = this.props
+  componentWillMount () {
+    const {accounts} = this.props;
     if (!accounts || accounts.length === 0) {
-      this.setState({
+      this.setState ({
         ready: true,
-        hasAccount: false
-      })
+        hasAccount: false,
+      });
     } else {
-      this.checkWhitelisted()
+      this.checkWhitelisted ();
     }
   }
 
   checkWhitelisted = () => {
     const {accounts, controller} = this.props;
-    controller.isWhitelisted(`${accounts[0]}`)
-      .then(isWhitelisted => {
-        this.setState({
-          ready: true,
-          hasAccount: true,
-          isWhitelisted
-        })
-      })
-  }
+    controller.isWhitelisted (`${accounts[0]}`).then (isWhitelisted => {
+      this.setState ({
+        ready: true,
+        hasAccount: true,
+        isWhitelisted,
+      });
+    });
+  };
 
-  render() {
+  render () {
     return (
       <div className="pure-g">
         <div className="pure-u-1-1">
-          {
-            this.state.isWhitelisted ?
-              <WhitelistedInstructions checkWhitelisted={this.checkWhitelisted} {...this.props} />:
-              <NotWhitelisted checkWhitelisted={this.checkWhitelisted} {...this.props} />
-          }
+          {this.state.isWhitelisted
+            ? <WhitelistedInstructions
+                checkWhitelisted={this.checkWhitelisted}
+                {...this.props}
+              />
+            : <NotWhitelisted
+                checkWhitelisted={this.checkWhitelisted}
+                {...this.props}
+              />}
         </div>
       </div>
-    )
+    );
   }
 }
 
-export default Syndicate
+export default Syndicate;

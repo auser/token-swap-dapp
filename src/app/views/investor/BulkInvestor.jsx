@@ -1,8 +1,7 @@
 import React from 'react';
 // import { Link } from 'react-router-dom'
 import Loading from '../../components/Loading';
-import PrintReceipt from '../../components/PrintReceipt';
-import RequestTransfer from './RequestTransfer';
+import BulkRequestTokens from './BulkRequestTokens';
 
 const InvalidAddress = () => (
   <div className="pure-u-1-1">
@@ -18,7 +17,6 @@ const Thanks = props => (
     <h1>Thanks for submitting your requests for a token swap.</h1>
     <p>Your transaction ID is:</p>
     <pre>{props.completedTxId}</pre>
-    <PrintReceipt transaction={props.completedTransaction} {...props} />
   </div>
 );
 
@@ -91,7 +89,6 @@ export class Investor extends React.Component {
   };
 
   onRequestTransfers = async (amounts, txs, fromAddresses) => {
-    console.log ('request transfers here...');
     const contract = this.props.SwapContract.at(this.state.contractAddress)
 
     try {
@@ -105,6 +102,7 @@ export class Investor extends React.Component {
         }
       })
     } catch (err) {
+      console.log("err ------------>", err)
       this.setState({error: err})
     }
   };
@@ -136,12 +134,15 @@ export class Investor extends React.Component {
         <div className="pure-u-1-1">
           {error
             ? <h3>Unable to create transfer request</h3>
-: <RequestTransfer onRequestTransfer={this.onRequestTransfer} {...this.props} />
-  }
+            : <BulkRequestTokens
+                onRequestTransfers={this.onRequestTransfers}
+                {...this.props}
+              />}
         </div>
       </div>
     );
   }
 }
+// <RequestTransfer onRequestTransfer={this.onRequestTransfer} {...this.props} />
 
 export default Investor;
