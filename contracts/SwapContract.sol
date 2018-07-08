@@ -85,6 +85,22 @@ contract SwapContract is Ownable {
       return true;
     }
 
+    // TODO: move this lower
+    function requestTransferExists(address addr)
+        public
+        view
+        returns (bool)
+    {
+        if (_numRequests == 0) return false;
+        for (uint i = 0; i < _numRequests; i++) {
+            TransferRequest tr = _requests[i];
+            if (tr.investor == addr) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * @dev can the transfer request get swapped?
      * @param req TransferRequest we're checking on

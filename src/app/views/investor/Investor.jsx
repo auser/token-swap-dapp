@@ -17,7 +17,7 @@ const Thanks = (props) => (
     <h1>Thanks for submitting your request for a token swap.</h1>
     <p>Your transaction ID is:</p>
     <pre>{props.completedTxId}</pre>
-    <PrintReceipt {...props} />
+    <PrintReceipt transaction={props.completedTransaction} {...props} />
   </div>
 )
 
@@ -28,13 +28,14 @@ class RequestTransfer extends React.Component {
     this.state = {
       transactionHash: '',
       amount: 0,
-      fromAddress: null
+      fromAddress: null,
+      toAddress: null,
     }
   }
 
   handleSubmit = (evt) => {
     evt.preventDefault();
-    this.props.onRequestTransfer(this.state.fromAddress, this.state.amount);
+    this.props.onRequestTransfer(this.state);
   }
 
   onUpdated = (evt) => {
@@ -52,7 +53,7 @@ class RequestTransfer extends React.Component {
               const {args} = res
               const fromAddress = args.from;
               const amount = args.value.toNumber()
-              this.setState({amount, fromAddress})
+              this.setState({amount, fromAddress, transactionHash: value})
             }
           })
         } else {
@@ -141,26 +142,48 @@ export class Investor extends React.Component {
     })
   }
 
-  onRequestTransfer = async (fromAddress, amount) => {
+  onRequestTransfer = async (req) => {
     const contract = this.props.SwapContract.at(this.state.contractAddress)
     // TODO: Check balance of original shopin tokens
     // and request the transfer with that amount
     // console.log('account ->', accounts[0])
-    const evt = await contract.requestTransfer(amount, {from: fromAddress})
-    this.setState({completed: true, completedTxId: evt.tx, completedTransaction: evt})
-  }
+    try {
+      const evt = await contract.requestTransfer(req.amount, req.transactionHash, {from: req.fromAddress})
+
+      this.setState({
+        completed: true,
+        completedTxId: evt.tx,
+        completedTransaction: {
+          ...req,
+          transactionHash: evt.tx,
+          toAddress: this.state.contractAddress,
+        }
+      })
+    } catch (err) {
+      this.setState({error: err})
+    }
+ }
 
   render() {
-    const {loaded, completed, completedTxId, contractFound} = this.state;
+    const {loaded, completed, completedTxId, completedTransaction, contractFound, error} = this.state;
 
     if (!loaded) return <Loading />
     if (!contractFound) return <InvalidAddress />
-    if (completed) return <Thanks completed={completed} completedTxId={completedTxId} />
+      if (completed) {
+        return <Thanks
+            completed={completed}
+            completedTxId={completedTxId}
+            completedTransaction={completedTransaction} />
+      }
 
     return (
       <div className="pure-g">
         <div className="pure-u-1-1">
-          <RequestTransfer onRequestTransfer={this.onRequestTransfer} {...this.props} />
+          {
+            error ?
+            <h3>Unable to create transfer request</h3> :
+            <RequestTransfer onRequestTransfer={this.onRequestTransfer} {...this.props} />
+          }
         </div>
       </div>
     )

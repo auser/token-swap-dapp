@@ -29,16 +29,16 @@ const Receipt = ({transactionHash, fromAddress, toAddress, amount}) => (
     </div>
     <div className="body">
       <p>Your transaction hash: {transactionHash}</p>
-      <p>
-        <h2 style={{fontSize: 28}}>Transaction details</h2>
-        <table style={{
-          width: '100%'
-        }}>
+      <h2 style={{fontSize: 28}}>Transaction details</h2>
+      <table style={{
+        width: '100%'
+      }}>
+        <tbody>
           <DataRow title='From' value={fromAddress} />
           <DataRow title='To' value={toAddress} />
           <DataRow title='Number of tokens' value={amount} />
-        </table>
-      </p>
+        </tbody>
+      </table>
     </div>
   </page>
 );
