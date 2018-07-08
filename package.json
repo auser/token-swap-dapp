@@ -71,7 +71,7 @@
   },
   "dependencies": {
     "dotenv": "^2.0.0",
-    "hanzo-solidity": "^0.1.3",
+    "hanzo-solidity": "^0.1.5",
     "html2canvas": "^1.0.0-alpha.12",
     "jspdf": "^1.4.1",
     "react": "^15.4.2",
