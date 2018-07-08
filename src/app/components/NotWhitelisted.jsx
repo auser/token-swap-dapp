@@ -18,7 +18,7 @@ export class WhitelistedInstructions extends React.Component {
               instructions on how to claim your new SHOPIN Tokens.
             </p>
 
-            <button onClick={this.props.checkWhitelisted}>Check account</button>
+            <button className="pure-button" onClick={this.props.checkWhitelisted}>Check account</button>
           </div>
         </div>
       </div>

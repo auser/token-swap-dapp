@@ -36,8 +36,8 @@ const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, isReady}
     <h2>Token swap contract deployed</h2>
 
     <p>
-      Please ensure that members of your group visit your unique
-      <Link to={`/${instanceId}`}>DApp URL</Link> to claim their
+      Please ensure that members of your group visit your
+      unique <Link to={`/${instanceId}`}>DApp URL</Link> to claim their
       SHOPIN Tokens. After verifying the return of your syndicate
       participants’ SHOP tokens, Shopin will enable the distribution
       of SHOPIN Tokens to your group.
