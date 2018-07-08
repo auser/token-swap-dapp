@@ -3,7 +3,7 @@ import {Link} from 'react-router-dom';
 
 const CreateContractInstance = ({checkWhitelisted, deploying, accounts, onCreate}) => (
   <div className="pure-u-1-1">
-    <h3>Deploy your collection contract</h3>
+    <h3>Deploy a contract for your syndicate</h3>
     <p>
       Deploy a token swap smart contract for your syndicate to enable members
       of your group to claim their SHOPIN tokens. After deploying your unique swap
