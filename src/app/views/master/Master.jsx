@@ -8,8 +8,8 @@ export class Master extends React.Component {
     super(props);
 
     this.state = {
-      whitelist: [],
-      blacklist: []
+      tokenWhitelist: [],
+      tokenBlacklist: []
     }
   }
 
@@ -22,33 +22,119 @@ export class Master extends React.Component {
     }
   }
 
-  getWhitelist = async () => {}
+  // SO FREAKING LAME
+  setupTokenListWatcher = async () => {
+    const {newToken} = this.props;
+    const filter = newToken.allEvents({
+      fromBlock: 0
+    })
+
+    filter.watch((err, evt) => {
+      let whitelist = this.state.tokenWhitelist
+      let blacklist = this.state.tokenBlacklist;
+
+      if (evt.event === 'AddedToWhitelist') {
+        const idx = whitelist.indexOf(evt.args._addr)
+        if (!idx || idx < 0) {
+          whitelist.push(evt.args._addr);
+        }
+      } else if (evt.event === 'RemovedFromWhitelist') {
+        const idx = whitelist.indexOf(evt.args._addr);
+        if (idx && idx >= 0) {
+          whitelist.splice(idx)
+        }
+      } else if (evt.event === 'AddedToBlacklist') {
+        const idx = blacklist.indexOf(evt.args._addr)
+        if (!idx || idx < 0) {
+          blacklist.push(evt.args._addr);
+        }
+      } else if (evt.event === 'RemovedFromBlacklist') {
+        const idx = blacklist.indexOf(evt.args._addr);
+        if (idx && idx >= 0) {
+          blacklist.splice(idx)
+        }
+      }
+
+      this.setState({
+        tokenWhitelist: whitelist.unique(),
+        tokenBlacklist: blacklist.unique()
+      })
+    })
+
+    this.filter = filter;
+  }
+
+  removeFromTokenWhitelist = async (addr) => {
+    const {newToken, accounts} = this.props
+    await newToken.removeFromWhitelist(addr, {from: accounts[0]});
+  }
+
+  addToTokenWhitelist = async (addr) => {
+    const {newToken, accounts} = this.props;
+    await newToken.addToWhitelist(addr, {from: accounts[0]});
+  }
+
+  removeFromTokenBlacklist = async (addr) => {
+    const {newToken, accounts} = this.props
+    await newToken.removeFromBlacklist(addr, {from: accounts[0]})
+  }
+
+  addToTokenBlacklist = async (addr) => {
+    const {newToken, accounts} = this.props
+    await newToken.addToBlacklist(addr, {from: accounts[0]})
+  }
+
 
   componentDidMount() {
     this.isOwner()
     .then(() => {
-      this.getWhitelist()
+      this.setupTokenListWatcher()
     })
   }
 
+  componentWillUnmount() {
+    if (this.filter) {
+      this.filter.stopWatching()
+    }
+  }
+
   render() {
-    const {whitelist, blacklist} = this.state;
-    const {controller, newToken, accounts} = this.props;
+    const {tokenWhitelist, tokenBlacklist} = this.state;
+    const {newToken, accounts} = this.props;
+    const boxStyle = {
+      border: '0.5px solid grey',
+      padding: 20,
+    }
 
     return (
       <div className="master">
-        <h1>Master</h1>
-
-        <div className="pure-u-1-1">
+        <div className="pure-u-1-1" style={boxStyle}>
           <h2>Token</h2>
           <Paused
             title={'Token paused:'}
             account={accounts[0]}
             pauseContract={newToken}
           />
+
+          <div className="pure-u-1-1">
+            <Listing
+              title='Whitelist'
+              onRemove={this.removeFromTokenWhitelist}
+              onAdd={this.addToTokenWhitelist}
+              list={tokenWhitelist} />
+          </div>
+
+          <div className="pure-u-1-1">
+            <Listing
+              title='Blacklist'
+              onRemove={this.removeFromTokenBlacklist}
+              onAdd={this.addToTokenBlacklist}
+              list={tokenBlacklist} />
+          </div>
         </div>
 
-        <div className="pure-u-1-1">
+        {/*
+        <div className="pure-u-1-1" style={boxStyle}>
           <h2>Controller</h2>
           <Paused 
             title={'Controller paused'}
@@ -56,16 +142,10 @@ export class Master extends React.Component {
             pauseContract={controller} />
 
           <div className="pure-u-1-1">
-            <Listing
-              title='Whitelist'
-              list={whitelist} />
-          </div>
-
-
-          <div className="pure-u-1-1">
-            {blacklist.length}
+            {tokenBlacklist.length}
           </div>
         </div>
+        */}
 
       </div>
     )
