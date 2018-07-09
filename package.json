@@ -64,6 +64,7 @@
     "truffle": "^4.1.13",
     "truffle-contract": "^1.1.8",
     "truffle-solidity-loader": "0.0.8",
+    "truffle-wallet-provider": "0.0.5",
     "url-loader": "0.5.7",
     "webpack": "1.14.0",
     "webpack-dev-server": "1.16.2",

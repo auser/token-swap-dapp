@@ -1,15 +1,24 @@
-require('babel-register');
-require('babel-polyfill');
-
-const HDWalletProvider = require("truffle-hdwallet-provider");
+const Wallet = require('ethereumjs-wallet')
+const WalletProvider = require('truffle-wallet-provider')
+const Web3 = require('web3')
+const web3 = new Web3()
 
 let secrets = {}
 try {
   secrets = require('./secrets')
 } catch(err) {}
 
-const mnemonic = process.env.MNEMONIC || secrets.mnemonic;
-const infura = process.env.INFURA || secrets.infura
+const INFURA              = process.env.INFURA || secrets.infura
+const MAINNET_PRIVATE_KEY = process.env.MAINNET_PRIVATE_KEY || secrets.mainnet
+const ROPSTEN_PRIVATE_KEY = process.env.ROPSTEN_PRIVATE_KEY || secrets.ropsten
+
+var mainnetPrivateKey = new Buffer(MAINNET_PRIVATE_KEY, 'hex')
+var mainnetWallet = Wallet.fromPrivateKey(mainnetPrivateKey);
+var mainnetProvider = new WalletProvider(mainnetWallet, `https://mainnet.infura.io/${INFURA}`);
+
+var ropstenPrivateKey = new Buffer(ROPSTEN_PRIVATE_KEY, 'hex')
+var ropstenWallet = Wallet.fromPrivateKey(ropstenPrivateKey);
+var ropstenProvider = new WalletProvider(ropstenWallet, `https://ropsten.infura.io/{INURA}`);
 
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
@@ -20,18 +29,17 @@ module.exports = {
       port: 8545,
       network_id: '*'
     },
-    production: {
-      provider: function() {
-        return new HDWalletProvider(mnemonic, `https://mainnet.infura.io/${infura}`, 0)
-      },
-      gas: 4700000,
-      network_id: 1
+    mainnet: {
+      network_id: 1,
+      provider: mainnetProvider,
+      gas: 7500000,
+      gasPrice: web3.toWei('20', 'gwei'),
     },
     ropsten: {
-      provider: function() {
-        return new HDWalletProvider(mnemonic, `https://ropsten.infura.io/${infura}`, 0)
-      },
-      network_id: 3
+      network_id: 3,
+      provider: ropstenProvider,
+      gas: 6000000,
+      gasPrice: web3.toWei('20', 'gwei'),
     },
   },
   mocha: {
