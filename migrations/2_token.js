@@ -1,4 +1,3 @@
-const csv = require ('csv');
 const logger = require ('../lib/logger');
 const Token = artifacts.require ('ShopinToken');
 
