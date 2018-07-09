@@ -25,6 +25,7 @@ const trufflePath = path.join(CONTRACTS_PATH, './node_modules/.bin/truffle')
   process.env.REACT_APP_CONTROLLER_ADDRESS = controller
   process.env.REACT_APP_FACTORY_ADDRESS    = factory
   process.env.REACT_APP_TOKEN_ADDRESS      = original
+  process.env.REACT_APP_NEW_TOKEN_ADDRESS  = newToken
 
   // Start server
   require('./start')

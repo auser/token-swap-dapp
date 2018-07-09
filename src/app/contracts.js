@@ -3,12 +3,14 @@ import SwapFactory from '../../build/contracts/SwapFactory.json';
 import SwapContract from '../../build/contracts/SwapContract.json';
 import SwapController from '../../build/contracts/SwapController.json';
 import getWeb3 from '../utils/getWeb3';
+import ShopinToken from '../../build/contracts/ShopinToken.json'
 
 const contract = require ('truffle-contract');
 const factoryDef = contract (SwapFactory);
 const controllerDef = contract (SwapController);
 const swapContractDef = contract (SwapContract);
 const tokenContractDef = contract (ERC20);
+const newtokenDef = contract(ShopinToken)
 
 const loadContracts = () =>
   new Promise ((resolve, reject) => {
@@ -17,12 +19,14 @@ const loadContracts = () =>
       controllerDef.setProvider (web3.currentProvider);
       swapContractDef.setProvider (web3.currentProvider);
       tokenContractDef.setProvider (web3.currentProvider);
+      newtokenDef.setProvider(web3.currentProvider);
 
       // Get accounts.
       web3.eth.getAccounts (async (error, accounts) => {
         let controller;
         let factory;
         let token;
+        let newToken;
 
         if (error) {
           reject (error);
@@ -49,11 +53,20 @@ const loadContracts = () =>
           return reject (e);
         }
 
+        try {
+          newToken = await newtokenDef.at(
+            process.env.REACT_APP_NEW_TOKEN_ADDRESS
+          )
+        } catch (e) {
+          return reject(e);
+        }
+
         resolve ({
           accounts,
           controller,
           factory,
           token,
+          newToken,
           SwapContract: swapContractDef,
           web3,
         });

@@ -1,6 +1,7 @@
 import React from 'react'
 
-import Switch from '../../components/Switch'
+import Paused from './Paused'
+import Listing from './Listing'
 
 export class Master extends React.Component {
   constructor(props) {
@@ -8,8 +9,7 @@ export class Master extends React.Component {
 
     this.state = {
       whitelist: [],
-      blacklist: [],
-      active: false
+      blacklist: []
     }
   }
 
@@ -22,71 +22,49 @@ export class Master extends React.Component {
     }
   }
 
-  pollPaused = async (fn, expectedValue, id) => {
-    const currValue = await fn();
-    if (currValue !== expectedValue) {
-      if (id) clearTimeout(id);
-      id = setTimeout(() => {
-        this.pollPaused(fn, expectedValue, id);
-      }, 1000);
-    } else {
-      clearTimeout(id);
-    }
-  }
-
-  getActive = async () => {
-    const {controller} = this.props
-    const active = await controller.swapEnabled();
-    this.setState({active})
-    return active
-  }
-
-  togglePause = async (evt) => {
-    evt.preventDefault();
-    const {active} = this.state;
-    const {controller, accounts} = this.props;
-    const methodName = active ? 'disableSwap' : 'enableSwap'
-    try {
-      await controller[methodName]({from: accounts[0]});
-    } catch (e) {
-      console.log('error ->', e)
-    }
-    await this.pollPaused(async () => {
-      await this.getActive();
-      return this.state.active;
-    }, !active);
-  }
+  getWhitelist = async () => {}
 
   componentDidMount() {
     this.isOwner()
     .then(() => {
-      this.getActive()
+      this.getWhitelist()
     })
   }
 
   render() {
-    const {whitelist, blacklist, active} = this.state;
+    const {whitelist, blacklist} = this.state;
+    const {controller, newToken, accounts} = this.props;
 
     return (
       <div className="master">
         <h1>Master</h1>
 
-        <div className="pure-g">
-          <div className="pure-u-1-2">
-            <h2>Active</h2>
-          </div>
-          <div className="pure-u-1-2">
-            <Switch checked={active} onClick={this.togglePause} />
-          </div>
+        <div className="pure-u-1-1">
+          <h2>Token</h2>
+          <Paused
+            title={'Token paused:'}
+            account={accounts[0]}
+            pauseContract={newToken}
+          />
         </div>
 
         <div className="pure-u-1-1">
-          {whitelist.length}
-        </div>
+          <h2>Controller</h2>
+          <Paused 
+            title={'Controller paused'}
+            account={accounts[0]}
+            pauseContract={controller} />
+
+          <div className="pure-u-1-1">
+            <Listing
+              title='Whitelist'
+              list={whitelist} />
+          </div>
 
 
-        <div className="pure-u-1-1">
-          {blacklist.length}
+          <div className="pure-u-1-1">
+            {blacklist.length}
+          </div>
         </div>
 
       </div>
