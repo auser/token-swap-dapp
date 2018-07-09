@@ -9,7 +9,7 @@ export class WhitelistedInstructions extends React.Component {
             <h1>Welcome</h1>
             <p>
               If you are a syndicate lead, please ensure that your active
-              address in Metamask is whitelisted and that it is connected to Mainnet.
+              address in MetaMask is whitelisted and that it is connected to Mainnet.
             </p>
 
             <p>

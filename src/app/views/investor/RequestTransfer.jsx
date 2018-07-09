@@ -48,9 +48,9 @@ export class RequestTransfer extends React.Component {
   render () {
     return (
       <div className="pure-u-1-1">
-        <h1>Request a token transfer</h1>
+        <h1>Claim SHOPIN Tokens</h1>
         <p>
-          In order to receive SHOPIN tokens, you'll need to send your SHOP tokens to the following Ethereum address:
+          In order to receive SHOPIN Tokens, you'll need to send your SHOP Tokens to the following Ethereum address:
         </p>
 
         <p>
@@ -60,7 +60,7 @@ export class RequestTransfer extends React.Component {
         </p>
 
         <p>
-          Fill in your transaction hash from the transfer of your SHOP tokens here:
+          Fill in your transaction hash from the transfer of your SHOP Tokens here:
         </p>
 
         <div className="pure-u-1-1">
@@ -76,7 +76,7 @@ export class RequestTransfer extends React.Component {
 
             <p>
               <input
-                value={`Claim ${this.state.amount} SHOPIN tokens`}
+                value={`Claim ${this.state.amount} SHOPIN Tokens`}
                 type="submit"
                 disabled={this.state.amount === 0}
                 className="pure-button"

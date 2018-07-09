@@ -106,6 +106,7 @@ export class Investor extends React.Component {
         }
       })
     } catch (err) {
+      console.error(err)
       this.setState({error: err})
     }
   };
