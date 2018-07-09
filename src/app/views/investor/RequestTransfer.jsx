@@ -63,27 +63,26 @@ export class RequestTransfer extends React.Component {
           Fill in your transaction hash from the transfer of your SHOP Tokens here:
         </p>
 
-        <div className="pure-u-1-1">
-          <form onSubmit={this.handleSubmit}>
-            <div className="pure-u-1-1">
-              <input
-                onChange={this.onUpdated}
-                ref={r => (this.inputRef = r)}
-                style={{width: '100%', padding: 10}}
-                placeholder={'Your transaction hash, i.e. 0x...'}
-              />
-            </div>
+        <form className="pure-form" onSubmit={this.handleSubmit}>
+          <p>
+            <input
+              onChange={this.onUpdated}
+              ref={r => (this.inputRef = r)}
+              style={{width: '100%', padding: 10}}
+              placeholder={'Your transaction hash, i.e. 0x...'}
+            />
+          </p>
 
-            <p>
-              <input
-                value={`Claim ${this.state.amount} SHOPIN Tokens`}
-                type="submit"
-                disabled={this.state.amount === 0}
-                className="pure-button"
-              />
-            </p>
-          </form>
-        </div>
+          <p>
+            <button
+              className="pure-button"
+              type="submit"
+              disabled={this.state.amount === 0}
+            >
+              Claim {this.state.amount} SHOPIN Tokens
+            </button>
+          </p>
+        </form>
       </div>
     );
   }
