@@ -6,7 +6,7 @@ const SwapContract = artifacts.require('SwapContract')
 const SwapFactory = artifacts.require('SwapFactory')
 
 const originalTokenAddress = '';
-const TOKEN_OWNER = '0xF10507c5A8352a3Cb2AA4Ed59Dd0D839596e2f3B';
+const TOKEN_OWNER = process.env.TOKEN_OWNER || '0xF10507c5A8352a3Cb2AA4Ed59Dd0D839596e2f3B';
 
 module.exports = function(deployer, network, [
     owner,
