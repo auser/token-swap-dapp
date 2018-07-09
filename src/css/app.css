@@ -28,8 +28,10 @@ code {
   padding: 80px 25px;
 }
 
-.pure-form input[type="text"]:focus {
-  border-color: #0c1a2b;
+/* FORM */
+
+.pure-form input:not([type]) {
+  border-radius: 2px;
 }
 
 /* NAVBAR */

@@ -5,8 +5,9 @@ import html2canvas from 'html2canvas';
 import shopinLogo from './logo__shopin.png';
 
 const DataRow = ({title, value}) => (
-  <tr><td style={{fontSize: 24}}><strong>{title}</strong></td><td  style={{fontSize: 22}}>{value}</td></tr>
+  <tr><td style={{fontSize: 18}}><strong>{title}</strong></td><td style={{fontSize: 16}}>{value}</td></tr>
 )
+
 const Receipt = ({transactionHash, fromAddress, toAddress, amount}) => (
   <page
     id="receiptDiv"
@@ -27,16 +28,24 @@ const Receipt = ({transactionHash, fromAddress, toAddress, amount}) => (
     <div className="header">
       <img role="presentation" src={shopinLogo} />
     </div>
+
     <div className="body">
-      <p>Your transaction hash: {transactionHash}</p>
-      <h2 style={{fontSize: 28}}>Transaction details</h2>
+      <h2>Token Swap Receipt</h2>
+
+      <p>
+        This confirms your transfer of {amount} SHOP tokens. Thank you for supporting Shopin!
+      </p>
+
+      <p>The transaction ID for your Swap Request is:</p>
+      <code>{transactionHash}</code>
+      <h2>Transaction details</h2>
       <table style={{
         width: '100%'
       }}>
         <tbody>
-          <DataRow title='From' value={fromAddress} />
-          <DataRow title='To' value={toAddress} />
-          <DataRow title='Number of tokens' value={amount} />
+          <DataRow title='Participant address' value={fromAddress} />
+          <DataRow title='Syndicate address' value={toAddress} />
+          <DataRow title='SHOP received' value={amount} />
         </tbody>
       </table>
     </div>
@@ -73,9 +82,16 @@ class PrintReceipt extends React.Component {
   render () {
     return (
       <div className="printer">
-        <h1>
-        Your receipt
-        </h1>
+        <h1>Your receipt</h1>
+
+        {
+          this.state.printing &&
+          <p>
+            Generating your receipt... it will download shortly...
+          </p>
+        }
+
+        <Receipt {...this.props.transaction} />
 
         <button
           style={{
@@ -86,15 +102,8 @@ class PrintReceipt extends React.Component {
           className="download-button pure-button"
           onClick={this.generatePDF}
         >
-          Generate PDF
+          Save PDF
         </button>
-        {
-          this.state.printing &&
-          <p>
-            Generating your receipt... it will download shortly...
-          </p>
-        }
-        <Receipt {...this.props.transaction} />
 
       </div>
     );
