@@ -2,7 +2,7 @@
   "name": "token-swap-dapp",
   "version": "0.1.0",
   "description": "Dapp and example Solidity contracts demonstrating a straight-forward token swap.",
-  "homepage": "http://github.com/auser/token-swap-dapp",
+  "homepage": "http://shopinswap.netlify.com",
   "repository": "github:auser/token-swap-dapp",
   "bugs": "http://github.com/auser/token-swap-dapp/issues",
   "author": "Ari Lerner <ari@shishi.to>",
