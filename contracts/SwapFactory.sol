@@ -186,6 +186,25 @@ contract SwapFactory is Ownable {
   }
 
   /**
+   * @dev contract index for the name
+   * @param name string the name of the contract
+   * @return (found, index) if the contract was found and the index
+   */
+  function contractIndexForName(string name)
+    public
+    view
+    returns (bool found, uint index)
+  {
+    if(contractIndex.length == 0) return (false, 0);
+    for (uint i = 0; i < contractIndex.length; i++) {
+      if (stringToUint(contractStructs[i].name) == stringToUint(name)) {
+        return (true, i);
+      }
+    }
+    return (false, 0);
+  }
+
+  /**
    * @dev get the contract by index
    * @param _contractIndex uint of the index of the contract
    * @return (string, address, uint) details of the contract

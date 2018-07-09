@@ -14,7 +14,8 @@ contract SwapContract is Ownable {
     address public controllerTokenAddress;
 
     struct TransferRequest {
-        address investor;
+        address toAddress;
+        address txAddress;
         uint256 amount;
         bool completed;
         uint index;
@@ -24,7 +25,8 @@ contract SwapContract is Ownable {
     uint _numRequests;
     mapping (uint => TransferRequest) _requests;
 
-    event RequestToTransfer(uint numRequests);
+    event RequestToTransfer(uint numRequests, uint requestId, address investor,
+                           uint256 amount);
     event TransferExecuted(uint idx, address indexed investor, uint256 amount);
 
     /**
@@ -62,39 +64,81 @@ contract SwapContract is Ownable {
     }
 
     /**
+     * @dev main function for creating transfer requests in bulk
+     * @param _toAddresses address[] destination to send SHOPIN tokens
+     * @param _txAddresses address[] addresses of SHOP transactions
+     * @param _amounts uint[] amount of tokens requested in swap
+     * @return bool success boolean
+     */
+    function requestTransfers(
+      address[] _toAddresses,
+      address[] _txAddresses,
+      uint[] _amounts
+    )
+      public
+      returns (bool)
+    {
+        // Both arrays must be same length
+        require(_toAddresses.length == _txAddresses.length);
+        require(_txAddresses.length == _amounts.length);
+
+        // Perform each request
+        for (uint256 i=0; i < _amounts.length; i++) {
+            requestTransfer(_toAddresses[i], _txAddresses[i], _amounts[i]);
+        }
+
+        return true;
+    }
+
+    /**
      * @dev main function for creating transfer requests
+     * @param _toAddress address destination to send SHOPIN tokens
+     * @param _txAddress address address of SHOP transaction
      * @param _amount uint amount of tokens requested in swap
      * @return bool success boolean
      */
     function requestTransfer(
+      address _toAddress,
+      address _txAddress,
       uint _amount
     )
       public
       returns (bool)
     {
-      uint _requestId = _numRequests++;
-      TransferRequest memory req = TransferRequest(
-        msg.sender, // investor
-        _amount,
-        false,
-        _requestId
-      );
-      _requests[_requestId] = req;
-      // emit
-      emit RequestToTransfer(_numRequests);
-      return true;
+        // request cannot already exist for this transaction
+        require(!requestTransferExists(_txAddress));
+        // cannot request transfer of 0 SHOP tokens
+        require(_amount > 0);
+        // ensure no zero address
+        require(_txAddress != address(0));
+
+        uint _requestId = _numRequests++;
+        TransferRequest memory req = TransferRequest(
+            _toAddress,
+            _txAddress,
+            _amount,
+            false,
+            _requestId
+        );
+        _requests[_requestId] = req;
+        // emit
+        emit RequestToTransfer(_numRequests, _requestId, _txAddress, _amount);
+        return true;
     }
 
-    // TODO: move this lower
-    function requestTransferExists(address addr)
-        public
-        view
-        returns (bool)
-    {
-        if (_numRequests == 0) return false;
-        for (uint i = 0; i < _numRequests; i++) {
-            TransferRequest tr = _requests[i];
-            if (tr.investor == addr) {
+    /**
+     * @dev is address in list of transfer requests?
+     * @param _txAddress addr address we're checking
+     * @return bool if the address has already submitted a transfer request
+     */
+    function requestTransferExists(address _txAddress) public view returns (bool) {
+        if (_numRequests == 0) {
+            return false;
+        }
+
+        for (uint i=0; i<_numRequests; i++) {
+            TransferRequest memory req = _requests[i];
+            if (req.txAddress == _txAddress) {
                 return true;
             }
         }
@@ -108,7 +152,7 @@ contract SwapContract is Ownable {
      */
     function canSwap(TransferRequest req) internal view returns (bool) {
         SwapController controller = SwapController(controllerTokenAddress);
-        return controller.canSwap(req.investor);
+        return controller.canSwap(req.toAddress);
     }
 
     /**
@@ -127,8 +171,8 @@ contract SwapContract is Ownable {
             TransferRequest storage req = _requests[i];
             if (!req.completed && canSwap(req)) {
                 // Execute transfer
-                token.transfer(req.investor, req.amount);
-                emit TransferExecuted(i, req.investor, req.amount);
+                token.transfer(req.toAddress, req.amount);
+                emit TransferExecuted(i, req.toAddress, req.amount);
                 _requests[i].completed = true;
             }
         }
@@ -196,28 +240,8 @@ contract SwapContract is Ownable {
       view
       returns (address)
     {
-      return _requests[idx].investor;
+      return _requests[idx].toAddress;
     }
-
-
-    // function executeRequestTransfer(
-    //     uint idx
-    // )
-    //     onlyTokenOwner
-    //     public
-    //     returns (bool)
-    // {
-    //     ERC20 token = ERC20(tokenAddress);
-    //     TransferRequest storage req = _requests[idx];
-    //     if (!req.completed) {
-    //         // Execute transfer
-    //          ERC20Basic(tokenAddress);
-    //         token.transfer(req.investor, req.amount);
-    //         emit TransferExecuted(req.investor, req.amount);
-    //         _requests[idx].completed = true;
-    //     }
-    //     return true;
-    // }
 
     /**
      * @dev get the completed status of the transfer request
