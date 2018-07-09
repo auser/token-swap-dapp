@@ -30,6 +30,7 @@ export class Master extends React.Component {
     })
 
     filter.watch((err, evt) => {
+      console.log(evt)
       let whitelist = this.state.tokenWhitelist
       let blacklist = this.state.tokenBlacklist;
 
