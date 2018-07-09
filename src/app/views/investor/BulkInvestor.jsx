@@ -69,8 +69,9 @@ export class Investor extends React.Component {
     // console.log('account ->', accounts[0])
     try {
       const evt = await contract.requestTransfer (
-        req.amount,
+        req.fromAddress,
         req.transactionHash,
+        req.amount,
         {from: req.fromAddress}
       );
 
@@ -92,7 +93,7 @@ export class Investor extends React.Component {
     const contract = this.props.SwapContract.at(this.state.contractAddress)
 
     try {
-      const evt = await contract.requestTransfers(amounts, txs, fromAddresses)
+      const evt = await contract.requestTransfers(fromAddresses, txs, amounts)
 
       this.setState({
         completed: true,

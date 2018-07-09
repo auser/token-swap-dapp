@@ -57,7 +57,7 @@ export class Investor extends React.Component {
   loadContract = async () => {
     const {factory} = this.props;
     const {contractIndex} = this.state;
-    const contract = await factory.getContractAtIndex (contractIndex);
+    const contract = await factory.getContractAtIndex(contractIndex);
     const contractAddress = contract[1];
     this.setState ({
       contractAddress,
@@ -65,12 +65,12 @@ export class Investor extends React.Component {
   };
 
   onRequestTransfer = async req => {
-    const contract = this.props.SwapContract.at (this.state.contractAddress);
+    const contract = this.props.SwapContract.at(this.state.contractAddress);
     // TODO: Check balance of original shopin tokens
     // and request the transfer with that amount
     // console.log('account ->', accounts[0])
     try {
-      const evt = await contract.requestTransfer (
+      const evt = await contract.requestTransfer(
         req.amount,
         req.transactionHash,
         this.props.accounts[0],
@@ -135,10 +135,11 @@ export class Investor extends React.Component {
     return (
       <div className="pure-g">
         <div className="pure-u-1-1">
-          {error
-            ? <h3>Unable to create transfer request</h3>
-: <RequestTransfer onRequestTransfer={this.onRequestTransfer} {...this.props} />
-  }
+          {
+            error ?
+            <h3>Unable to create transfer request</h3> :
+            <RequestTransfer onRequestTransfer={this.onRequestTransfer} {...this.props} />
+          }
         </div>
       </div>
     );
