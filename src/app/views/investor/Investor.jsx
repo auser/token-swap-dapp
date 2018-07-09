@@ -16,8 +16,8 @@ const InvalidAddress = () => (
 const Thanks = props => (
   <div className="pure-u-1-1">
     <h1>Thank you for claiming your SHOPIN Tokens</h1>
-    <p>Your transaction ID is:</p>
-    <pre>{props.completedTxId}</pre>
+    <p>The transaction ID for your Swap Request is:</p>
+    <code>{props.completedTxId}</code>
     <PrintReceipt transaction={props.completedTransaction} {...props} />
   </div>
 );
