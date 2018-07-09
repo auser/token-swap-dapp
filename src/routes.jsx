@@ -17,7 +17,7 @@ export const Routes = props => {
           <img
             role="presentation"
             className="pure-menu-heading"
-            src="img/logo.svg"
+            src="/img/logo.svg"
           />
         </a>
         <Link to="/" className="pure-menu-heading pure-menu-link">
