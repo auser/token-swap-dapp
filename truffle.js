@@ -4,7 +4,9 @@ require('babel-polyfill');
 const HDWalletProvider = require("truffle-hdwallet-provider");
 
 let secrets = {}
-if (require.resolve('./secrets')) secrets = require('./secrets')
+try {
+  secrets = require('./secrets')
+} catch(err) {}
 
 const mnemonic = process.env.MNEMONIC || secrets.mnemonic;
 const infura = process.env.INFURA || secrets.infura
