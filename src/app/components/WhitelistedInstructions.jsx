@@ -50,7 +50,7 @@ const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, isReady}
     <h3>Link for your syndicate:</h3>
     <code>
       <Link to={`/${instanceId}`}>
-        https://tokenswap.shopin.com/{instanceId}
+        { `${location.protocol}//${location.hostname}/${instanceId}` }
       </Link>
     </code>
 
