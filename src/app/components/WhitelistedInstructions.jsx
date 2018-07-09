@@ -6,7 +6,7 @@ const CreateContractInstance = ({checkWhitelisted, error, deploying, accounts, o
     <h3>Deploy a contract for your syndicate</h3>
     <p>
       Deploy a Token Swap Smart Contract for your syndicate to enable members
-      of your group to claim their SHOPIN tokens. After deploying your unique swap
+      of your group to claim their SHOPIN Tokens. After deploying your unique swap
       contract, make sure to share your unique URL so that members of your group
       can claim their new SHOPIN Tokens.
     </p>
@@ -33,13 +33,13 @@ const CreateContractInstance = ({checkWhitelisted, error, deploying, accounts, o
 
 const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, isReady}) => (
   <div className="pure-u-1-1">
-    <h2>Token swap contract deployed</h2>
+    <h2>Token Swap Contract deployed</h2>
 
     <p>
       Please ensure that members of your group visit your
       unique <Link to={`/${instanceId}`}>DApp URL</Link> to claim their
       SHOPIN Tokens. After verifying the return of your syndicate
-      participants’ SHOP tokens, Shopin will enable the distribution
+      participants’ SHOP Tokens, Shopin will enable the distribution
       of SHOPIN Tokens to your group.
     </p>
     <p>
@@ -50,11 +50,11 @@ const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, isReady}
     <h3>Link for your syndicate:</h3>
     <code>
       <Link to={`/${instanceId}`}>
-        https://swap.shopin.com/{instanceId}
+        https://tokenswap.shopin.com/{instanceId}
       </Link>
     </code>
 
-    <h3>Distribute SHOPIN tokens:</h3>
+    <h3>Distribute SHOPIN Tokens:</h3>
     <button
       disabled={!isReady}
       className="pure-button swap-button">
