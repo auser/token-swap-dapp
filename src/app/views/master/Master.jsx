@@ -109,7 +109,7 @@ export class Master extends React.Component {
     return (
       <div className="master">
         <div className="pure-u-1-1" style={boxStyle}>
-          <h2>Token</h2>
+          <h2>Shopin Token</h2>
           <Paused
             title={'Token paused:'}
             account={accounts[0]}
@@ -136,7 +136,7 @@ export class Master extends React.Component {
         {/*
         <div className="pure-u-1-1" style={boxStyle}>
           <h2>Controller</h2>
-          <Paused 
+          <Paused
             title={'Controller paused'}
             account={accounts[0]}
             pauseContract={controller} />

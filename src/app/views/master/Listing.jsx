@@ -33,11 +33,13 @@ export class Listing extends React.Component {
 
     return (
       <div className="pure-u-1-1-">
-        <h1>{title}</h1>
-        <div className="pure-g">
+        <h3>{title}</h3>
           {
             list.map(item => (
-              <div key={item}>
+              <p key={item}>
+                <div className="pure-u-1-2">
+                  {item}
+                </div>
                 <div className="pure-u-1-2">
                   <button
                     onClick={this.handleRemove.bind(this, item)}
@@ -45,13 +47,9 @@ export class Listing extends React.Component {
                     Remove
                   </button>
                 </div>
-                <div className="pure-u-1-2">
-                  {item}
-                </div>
-              </div>
+              </p>
             ))
           }
-        </div>
 
         <form className="pure-form" onSubmit={this.handleSubmit}>
           <fieldset>
