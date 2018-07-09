@@ -7,6 +7,7 @@ import shopinLogo from './logo__shopin.png';
 const DataRow = ({title, value}) => (
   <tr><td style={{fontSize: 24}}><strong>{title}</strong></td><td  style={{fontSize: 22}}>{value}</td></tr>
 )
+
 const Receipt = ({transactionHash, fromAddress, toAddress, amount}) => (
   <page
     id="receiptDiv"
@@ -27,6 +28,7 @@ const Receipt = ({transactionHash, fromAddress, toAddress, amount}) => (
     <div className="header">
       <img role="presentation" src={shopinLogo} />
     </div>
+
     <div className="body">
       <p>Your transaction hash: {transactionHash}</p>
       <h2 style={{fontSize: 28}}>Transaction details</h2>
@@ -73,9 +75,16 @@ class PrintReceipt extends React.Component {
   render () {
     return (
       <div className="printer">
-        <h1>
-        Your receipt
-        </h1>
+        <h1>Your receipt</h1>
+
+        {
+          this.state.printing &&
+          <p>
+            Generating your receipt... it will download shortly...
+          </p>
+        }
+
+        <Receipt {...this.props.transaction} />
 
         <button
           style={{
@@ -86,15 +95,8 @@ class PrintReceipt extends React.Component {
           className="download-button pure-button"
           onClick={this.generatePDF}
         >
-          Generate PDF
+          Save PDF
         </button>
-        {
-          this.state.printing &&
-          <p>
-            Generating your receipt... it will download shortly...
-          </p>
-        }
-        <Receipt {...this.props.transaction} />
 
       </div>
     );
