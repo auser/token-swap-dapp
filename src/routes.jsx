@@ -1,10 +1,11 @@
 import React from 'react';
-import {Route, BrowserRouter, Switch} from 'react-router-dom';
+import {Route, BrowserRouter, Switch, Link} from 'react-router-dom';
 
 // import Home from './app/views/home/Home';
 import Syndicate from './app/views/syndicate/Syndicate';
 import Investor from './app/views/investor/Investor';
 import BulkInvestor from './app/views/investor/BulkInvestor'
+import Admin from './app/views/admin/Admin'
 
 export const Routes = props => {
   const render = Component => routerProps => (
@@ -17,9 +18,9 @@ export const Routes = props => {
             src="img/logo.svg"
           />
         </a>
-        <a href="#" className="pure-menu-heading pure-menu-link">
+        <Link to="/" className="pure-menu-heading pure-menu-link">
           Token Swap
-        </a>
+        </Link>
       </nav>
       <main className="container">
         <Component {...routerProps} {...props} />
@@ -30,6 +31,7 @@ export const Routes = props => {
   return (
     <BrowserRouter>
       <Switch>
+        <Route path="/:id/admin" render={render(Admin)} />
         <Route path="/:id/bulk" render={render (BulkInvestor)} />
         <Route path="/:id" render={render (Investor)} />
         <Route path="/" render={render (Syndicate)} />

@@ -73,6 +73,7 @@ export class Investor extends React.Component {
       const evt = await contract.requestTransfer (
         req.amount,
         req.transactionHash,
+        this.props.accounts[0],
         {from: req.fromAddress}
       );
 

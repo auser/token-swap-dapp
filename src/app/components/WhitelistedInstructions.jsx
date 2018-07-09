@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 
-const CreateContractInstance = ({checkWhitelisted, deploying, accounts, onCreate}) => (
+const CreateContractInstance = ({checkWhitelisted, error, deploying, accounts, onCreate}) => (
   <div className="pure-u-1-1">
     <h3>Deploy a contract for your syndicate</h3>
     <p>
@@ -10,11 +10,11 @@ const CreateContractInstance = ({checkWhitelisted, deploying, accounts, onCreate
       contract, make sure to share your unique URL so that members of your group
       can claim their new SHOPIN Tokens.
     </p>
-    {deploying ?
+    {deploying && !error ?
       <span>Deploying</span> :
       <button
       className="pure-button"
-      disabled={deploying}
+      disabled={deploying && !error}
       onClick={onCreate}>
       Deploy Swap Contract
       </button>
@@ -108,8 +108,15 @@ export class WhitelistedInstructions extends React.Component {
     this.setState({
       deploying: true
     }, async () => {
+      try {
+
       await factory.insertContract (`${accounts[0]}`, {from: accounts[0]});
       await this.afterContractCreation ();
+      } catch (e) {
+        this.setState({
+          error: e
+        })
+      }
     })
   };
 
@@ -138,6 +145,7 @@ export class WhitelistedInstructions extends React.Component {
                   checkWhitelisted={this.props.checkWhitelisted}
                   onCreate={this.onCreateInstance}
                   deploying={this.state.deploying}
+                  error={this.state.error}
                 />}
           </div>
         </div>
