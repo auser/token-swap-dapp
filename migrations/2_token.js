@@ -55,7 +55,7 @@ module.exports = function(deployer, network, [
         logger.info(`Transferred ${amount} SHOPIN to ${addr}, tx: ${res.tx}`);
       }
 
-      res = await token.addToWhitelist(addr, {from: owner});
+      let res = await token.addToWhitelist(addr, {from: owner});
       logger.info(`Whitelisted address: ${addr}, tx: ${res.tx}`);
     }
 
