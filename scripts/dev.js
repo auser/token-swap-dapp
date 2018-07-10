@@ -1,12 +1,8 @@
 const exec = require('executive')
-const path = require('path')
-
-const CONTRACTS_PATH = path.join(path.resolve(__dirname), '../../token-crowdsale')
-const trufflePath = path.join(CONTRACTS_PATH, './node_modules/.bin/truffle')
 
 ;(async () => {
   // Run truffle migrations
-  const {stdout} = await exec(`${trufflePath} migrate --reset --network development`, {cwd: CONTRACTS_PATH, env: process.env})
+  const {stdout} = await exec('truffle migrate --reset --network development')
 
   // Set env variables for dapp
   const controller = /SwapController: (\w+)/.exec(stdout)[1]
