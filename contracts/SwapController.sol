@@ -56,4 +56,8 @@ contract SwapController is Ownable, Pausable {
     function removeFromBlacklist(address addr) public onlyOwner {
         blacklist.removeFromBlacklist(addr);
     }
+
+    function isBlacklisted(address addr) public view returns (bool) {
+        return blacklist.isBlacklisted(addr);
+    }
 }
