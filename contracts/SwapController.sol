@@ -13,6 +13,11 @@ contract SwapController is Ownable, Pausable {
     event SwapEnabled();
     event SwapDisabled();
 
+    event AddedToWhitelist(address indexed _addr);
+    event RemovedFromWhitelist(address indexed _addr);
+    event AddedToBlacklist(address indexed _addr);
+    event RemovedFromBlacklist(address indexed _addr);
+
     constructor() public Ownable() {
         blacklist = new Blacklist();
         whitelist = new Whitelist();
@@ -37,24 +42,32 @@ contract SwapController is Ownable, Pausable {
         return swapEnabled() && !isBlacklisted(addr);
     }
 
-    function addToWhitelist(address addr) public onlyOwner {
+    function addToWhitelist(address addr) public onlyOwner returns (bool) {
         whitelist.addToWhitelist(addr);
+        emit AddedToWhitelist(addr);
+        return true;
     }
 
-    function removeFromWhitelist(address addr) public onlyOwner {
+    function removeFromWhitelist(address addr) public onlyOwner returns (bool) {
         whitelist.removeFromWhitelist(addr);
+        emit RemovedFromWhitelist(addr);
+        return true;
     }
 
     function isWhitelisted(address addr) public view returns (bool) {
         return whitelist.isWhitelisted(addr);
     }
 
-    function addToBlacklist(address addr) public onlyOwner {
+    function addToBlacklist(address addr) public onlyOwner returns (bool) {
         blacklist.addToBlacklist(addr);
+        emit AddedToBlacklist(addr);
+        return true;
     }
 
-    function removeFromBlacklist(address addr) public onlyOwner {
+    function removeFromBlacklist(address addr) public onlyOwner returns (bool) {
         blacklist.removeFromBlacklist(addr);
+        emit RemovedFromBlacklist(addr);
+        return true;
     }
 
     function isBlacklisted(address addr) public view returns (bool) {
