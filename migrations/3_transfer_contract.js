@@ -19,16 +19,17 @@ module.exports = function(deployer, network, [
   ]
 ) {
   deployer.then(async function() {
-    logger.info (`Deploying transfer contract for original owner`);
+    // logger.info (`Deploying transfer contract for original owner`);
 
-    const INITIAL_SUPPLY = 15e8 * (10 ** 9);
-    const originalToken = await deployer.deploy(OriginalToken, INITIAL_SUPPLY, {from: owner});
-    const originalTokenAddress = require('../lib/originalToken');
+    // const INITIAL_SUPPLY = 15e8 * (10 ** 9);
+    // const originalToken = await deployer.deploy(OriginalToken, INITIAL_SUPPLY, {from: owner});
+    // const originalTokenAddress = require('../lib/originalToken');
 
-    logger.info(`Deploying Swap controller...`)
-    await ShopinToken.deployed()
+    // logger.info(`Deploying Swap controller...`)
+    // await ShopinToken.deployed()
 
-    logger.info(`Deployed original token for testing to ${OriginalToken.address}`);
+    // logger.info(`Deployed original token for testing to ${OriginalToken.address}`);
+    ShopinTokenAddress = '0xf5c9b1aac5dbaa0a9280f102e43773156c94eabb';
 
     await deployer.deploy(SwapController, {from: owner})
     logger.info(`Deployed controller to ${SwapController.address}`)
@@ -41,11 +42,11 @@ module.exports = function(deployer, network, [
     try {
       logger.info(`
         Deploying SwapController with argument values:
-        TokenAddress: ${ShopinToken.address}
+        TokenAddress: ${ShopinTokenAddress}
         Controller address: ${SwapController.address}
         owner: ${owner}
       `)
-      await deployer.deploy (SwapContract, ShopinToken.address, SwapController.address, owner, {
+      await deployer.deploy (SwapContract, ShopinTokenAddress, SwapController.address, owner, {
         from: owner,
       });
     } catch (e) {
@@ -56,11 +57,11 @@ module.exports = function(deployer, network, [
     try {
       logger.info(`
         Deploying SwapFactory with argument values:
-        TokenAddress: ${ShopinToken.address}
+        TokenAddress: ${ShopinTokenAddress}
         Controller address: ${SwapController.address}
         owner: ${owner}
       `)
-      await deployer.deploy (SwapFactory, ShopinToken.address, SwapController.address, owner, {
+      await deployer.deploy (SwapFactory, ShopinTokenAddress, SwapController.address, owner, {
         from: owner,
       });
 
