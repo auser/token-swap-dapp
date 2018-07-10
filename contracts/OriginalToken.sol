@@ -7,9 +7,9 @@ import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 contract OriginalToken is StandardToken, Ownable {
     using SafeMath for uint256;
 
-    string public constant name = "Shopin Token"; // solium-disable-line uppercase
-    string public constant symbol = "SPN"; // solium-disable-line uppercase
-    uint8 public constant decimals = 6; // solium-disable-line uppercase
+    string public constant name = "Shopin Token (Original)"; // solium-disable-line uppercase
+    string public constant symbol = "SHOP"; // solium-disable-line uppercase
+    uint8 public constant decimals = 9; // solium-disable-line uppercase
 
     constructor(
         uint256 _totalSupply

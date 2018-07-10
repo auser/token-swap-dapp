@@ -3,8 +3,6 @@ import shortid from 'shortid';
 import {assert} from 'chai';
 const BigNumber = web3.BigNumber;
 
-const chunk = require ('../../lib/chunk');
-
 const should = require ('chai')
   .use (require ('chai-as-promised'))
   .use (require ('chai-bignumber') (BigNumber))
@@ -155,8 +153,6 @@ module.exports = Object.assign ({}, evmScript, {
   findEventLogs: (txResult, eventName) => {
     return txResult.logs.find (log => log.event === eventName);
   },
-
-  chunk,
 
   // assert throws
   async assertThrows (promise, msg='some test') {
