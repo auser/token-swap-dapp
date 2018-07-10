@@ -8,8 +8,8 @@ export class Controller extends React.Component {
     super(props);
 
     this.state = {
-      tokenWhitelist: [],
-      tokenBlacklist: []
+      controllerWhitelist: [],
+      controllerBlacklist: []
     }
   }
 
@@ -20,69 +20,60 @@ export class Controller extends React.Component {
     if (accounts[0] !== owner) {
       history.replace('/')
     }
-
-    console.log(accounts[0])
   }
 
   // SO FREAKING LAME
-  setupTokenListWatcher = async () => {
+  setupcontrollerListWatcher = async () => {
     const {controller} = this.props;
     const filter = controller.allEvents({
       fromBlock: 0
     })
 
     filter.watch((err, evt) => {
-      console.log(evt)
-      let whitelist = this.state.tokenWhitelist
-      let blacklist = this.state.tokenBlacklist;
+      let whitelist = this.state.controllerWhitelist
+      let blacklist = this.state.controllerBlacklist;
 
       if (evt.event === 'AddedToWhitelist') {
         const idx = whitelist.indexOf(evt.args._addr)
         if (!idx || idx < 0) {
-          whitelist.push(evt.args._addr);
+          whitelist = whitelist.concat(evt.args._addr);
         }
       } else if (evt.event === 'RemovedFromWhitelist') {
-        const idx = whitelist.indexOf(evt.args._addr);
-        if (idx && idx >= 0) {
-          whitelist.splice(idx, 1)
-        }
+        whitelist = whitelist.filter(ele => ele !== evt.args._addr);
       } else if (evt.event === 'AddedToBlacklist') {
         const idx = blacklist.indexOf(evt.args._addr)
         if (!idx || idx < 0) {
-          blacklist.push(evt.args._addr);
+          blacklist = blacklist.concat(evt.args._addr);
         }
       } else if (evt.event === 'RemovedFromBlacklist') {
-        const idx = blacklist.indexOf(evt.args._addr);
-        if (idx && idx >= 0) {
-          blacklist.splice(idx, 1)
-        }
+        blacklist = blacklist.filter(ele => ele !== evt.args._addr);
       }
 
       this.setState({
-        tokenWhitelist: whitelist.unique(),
-        tokenBlacklist: blacklist.unique()
+        controllerWhitelist: whitelist.unique(),
+        controllerBlacklist: blacklist.unique()
       })
     })
 
     this.filter = filter;
   }
 
-  removeFromTokenWhitelist = async (addr) => {
+  removeFromcontrollerWhitelist = async (addr) => {
     const {controller, accounts} = this.props
     await controller.removeFromWhitelist(addr, {from: accounts[0]});
   }
 
-  addToTokenWhitelist = async (addr) => {
+  addTocontrollerWhitelist = async (addr) => {
     const {controller, accounts} = this.props;
     await controller.addToWhitelist(addr, {from: accounts[0]});
   }
 
-  removeFromTokenBlacklist = async (addr) => {
+  removeFromcontrollerBlacklist = async (addr) => {
     const {controller, accounts} = this.props
     await controller.removeFromBlacklist(addr, {from: accounts[0]})
   }
 
-  addToTokenBlacklist = async (addr) => {
+  addTocontrollerBlacklist = async (addr) => {
     const {controller, accounts} = this.props
     await controller.addToBlacklist(addr, {from: accounts[0]})
   }
@@ -91,7 +82,7 @@ export class Controller extends React.Component {
   componentDidMount() {
     this.isOwner()
     .then(() => {
-      this.setupTokenListWatcher()
+      this.setupcontrollerListWatcher()
     })
   }
 
@@ -102,7 +93,7 @@ export class Controller extends React.Component {
   }
 
   render() {
-    const {tokenWhitelist, tokenBlacklist} = this.state;
+    const {controllerWhitelist, controllerBlacklist} = this.state;
     const {controller, accounts} = this.props;
     const boxStyle = {
       border: '0.5px solid grey',
@@ -122,17 +113,17 @@ export class Controller extends React.Component {
           <div className="pure-u-1-1">
             <Listing
               title='Whitelist'
-              onRemove={this.removeFromTokenWhitelist}
-              onAdd={this.addToTokenWhitelist}
-              list={tokenWhitelist} />
+              onRemove={this.removeFromcontrollerWhitelist}
+              onAdd={this.addTocontrollerWhitelist}
+              list={controllerWhitelist} />
           </div>
 
           <div className="pure-u-1-1">
             <Listing
               title='Blacklist'
-              onRemove={this.removeFromTokenBlacklist}
-              onAdd={this.addToTokenBlacklist}
-              list={tokenBlacklist} />
+              onRemove={this.removeFromcontrollerBlacklist}
+              onAdd={this.addTocontrollerBlacklist}
+              list={controllerBlacklist} />
           </div>
         </div>
 
@@ -145,7 +136,7 @@ export class Controller extends React.Component {
             pauseContract={controller} />
 
           <div className="pure-u-1-1">
-            {tokenBlacklist.length}
+            {controllerBlacklist.length}
           </div>
         </div>
         */}
