@@ -32,8 +32,8 @@ module.exports = {
     mainnet: {
       network_id: 1,
       provider: mainnetProvider,
-      gas: 7500000,
-      gasPrice: web3.toWei('20', 'gwei'),
+      gas: 7900000,
+      gasPrice: web3.toWei('100', 'gwei'),
     },
     ropsten: {
       network_id: 3,
@@ -44,5 +44,11 @@ module.exports = {
   },
   mocha: {
     reporter: 'spec'
+  },
+  solc: {
+    optimizer: {
+      enabled: true,
+      runs: 200
+    }
   }
 };
