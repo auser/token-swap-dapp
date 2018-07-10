@@ -44,7 +44,7 @@ export class Master extends React.Component {
       } else if (evt.event === 'RemovedFromWhitelist') {
         const idx = whitelist.indexOf(evt.args._addr);
         if (idx && idx >= 0) {
-          whitelist.splice(idx)
+          whitelist.splice(idx, 1)
         }
       } else if (evt.event === 'AddedToBlacklist') {
         const idx = blacklist.indexOf(evt.args._addr)
@@ -54,7 +54,7 @@ export class Master extends React.Component {
       } else if (evt.event === 'RemovedFromBlacklist') {
         const idx = blacklist.indexOf(evt.args._addr);
         if (idx && idx >= 0) {
-          blacklist.splice(idx)
+          blacklist.splice(idx, 1)
         }
       }
 

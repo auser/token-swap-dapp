@@ -36,7 +36,7 @@ export class Listing extends React.Component {
         <h3>{title}</h3>
           {
             list.map(item => (
-              <p key={item}>
+              <div key={item}>
                 <div className="pure-u-1-2">
                   {item}
                 </div>
@@ -47,7 +47,7 @@ export class Listing extends React.Component {
                     Remove
                   </button>
                 </div>
-              </p>
+              </div>
             ))
           }
 
