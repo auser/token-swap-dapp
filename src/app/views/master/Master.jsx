@@ -20,6 +20,8 @@ export class Master extends React.Component {
     if (accounts[0] !== owner) {
       history.replace('/')
     }
+
+    console.log(accounts[0])
   }
 
   // SO FREAKING LAME
