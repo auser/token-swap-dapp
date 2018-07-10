@@ -1,0 +1,158 @@
+import React from 'react'
+
+import Paused from './Paused'
+import Listing from './Listing'
+
+export class Controller extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      tokenWhitelist: [],
+      tokenBlacklist: []
+    }
+  }
+
+  isOwner = async () => {
+    const {accounts, controller, history} = this.props;
+    const owner = await controller.owner();
+
+    if (accounts[0] !== owner) {
+      history.replace('/')
+    }
+
+    console.log(accounts[0])
+  }
+
+  // SO FREAKING LAME
+  setupTokenListWatcher = async () => {
+    const {controller} = this.props;
+    const filter = controller.allEvents({
+      fromBlock: 0
+    })
+
+    filter.watch((err, evt) => {
+      console.log(evt)
+      let whitelist = this.state.tokenWhitelist
+      let blacklist = this.state.tokenBlacklist;
+
+      if (evt.event === 'AddedToWhitelist') {
+        const idx = whitelist.indexOf(evt.args._addr)
+        if (!idx || idx < 0) {
+          whitelist.push(evt.args._addr);
+        }
+      } else if (evt.event === 'RemovedFromWhitelist') {
+        const idx = whitelist.indexOf(evt.args._addr);
+        if (idx && idx >= 0) {
+          whitelist.splice(idx, 1)
+        }
+      } else if (evt.event === 'AddedToBlacklist') {
+        const idx = blacklist.indexOf(evt.args._addr)
+        if (!idx || idx < 0) {
+          blacklist.push(evt.args._addr);
+        }
+      } else if (evt.event === 'RemovedFromBlacklist') {
+        const idx = blacklist.indexOf(evt.args._addr);
+        if (idx && idx >= 0) {
+          blacklist.splice(idx, 1)
+        }
+      }
+
+      this.setState({
+        tokenWhitelist: whitelist.unique(),
+        tokenBlacklist: blacklist.unique()
+      })
+    })
+
+    this.filter = filter;
+  }
+
+  removeFromTokenWhitelist = async (addr) => {
+    const {controller, accounts} = this.props
+    await controller.removeFromWhitelist(addr, {from: accounts[0]});
+  }
+
+  addToTokenWhitelist = async (addr) => {
+    const {controller, accounts} = this.props;
+    await controller.addToWhitelist(addr, {from: accounts[0]});
+  }
+
+  removeFromTokenBlacklist = async (addr) => {
+    const {controller, accounts} = this.props
+    await controller.removeFromBlacklist(addr, {from: accounts[0]})
+  }
+
+  addToTokenBlacklist = async (addr) => {
+    const {controller, accounts} = this.props
+    await controller.addToBlacklist(addr, {from: accounts[0]})
+  }
+
+
+  componentDidMount() {
+    this.isOwner()
+    .then(() => {
+      this.setupTokenListWatcher()
+    })
+  }
+
+  componentWillUnmount() {
+    if (this.filter) {
+      this.filter.stopWatching()
+    }
+  }
+
+  render() {
+    const {tokenWhitelist, tokenBlacklist} = this.state;
+    const {controller, accounts} = this.props;
+    const boxStyle = {
+      border: '0.5px solid grey',
+      padding: 20,
+    }
+
+    return (
+      <div className="master">
+        <div className="pure-u-1-1" style={boxStyle}>
+          <h2>Swap Controller</h2>
+          <Paused
+            title={'Swap paused:'}
+            account={accounts[0]}
+            pauseContract={controller}
+          />
+
+          <div className="pure-u-1-1">
+            <Listing
+              title='Whitelist'
+              onRemove={this.removeFromTokenWhitelist}
+              onAdd={this.addToTokenWhitelist}
+              list={tokenWhitelist} />
+          </div>
+
+          <div className="pure-u-1-1">
+            <Listing
+              title='Blacklist'
+              onRemove={this.removeFromTokenBlacklist}
+              onAdd={this.addToTokenBlacklist}
+              list={tokenBlacklist} />
+          </div>
+        </div>
+
+        {/*
+        <div className="pure-u-1-1" style={boxStyle}>
+          <h2>Controller</h2>
+          <Paused
+            title={'Controller paused'}
+            account={accounts[0]}
+            pauseContract={controller} />
+
+          <div className="pure-u-1-1">
+            {tokenBlacklist.length}
+          </div>
+        </div>
+        */}
+
+      </div>
+    )
+  }
+}
+
+export default Controller
