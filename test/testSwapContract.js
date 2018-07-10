@@ -110,7 +110,7 @@ contract (
 
         it('can retrieve the transfer request amount', async () => {
           const amount = await transferContract.getTransferRequestAmount(0);
-          amount.should.be.bignumber.equal(100);
+          amount.should.be.bignumber.equal(100000000000);
         })
         it('can retrieve the transfer request address', async () => {
           const addr = await transferContract.getTransferRequestInvestor(0);
@@ -170,7 +170,7 @@ contract (
 
           it('the contract holds 1e4 tokens', async () => {
             const contractBalance = await tok.balanceOf(transferContract.address);
-            contractBalance.should.be.bignumber.equal(1e13);
+            contractBalance.should.be.bignumber.equal(1e4);
           })
 
           it('handles the shopin token in request', async () => {
