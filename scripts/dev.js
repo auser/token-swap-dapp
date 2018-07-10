@@ -1,8 +1,12 @@
 const exec = require('executive')
+const path = require('path')
+
+const node_modules = path.join(path.resolve(__dirname), '..', 'node_modules')
+const truffle = path.join(node_modules, '.bin', 'truffle')
 
 ;(async () => {
   // Run truffle migrations
-  const {stdout} = await exec('truffle migrate --reset --network development')
+  const {stdout} = await exec(`${truffle} migrate --reset --network development`)
 
   // Set env variables for dapp
   const controller = /SwapController: (\w+)/.exec(stdout)[1]

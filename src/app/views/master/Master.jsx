@@ -20,8 +20,6 @@ export class Master extends React.Component {
     if (accounts[0] !== owner) {
       history.replace('/')
     }
-
-    console.log(accounts[0])
   }
 
   // SO FREAKING LAME
@@ -32,30 +30,23 @@ export class Master extends React.Component {
     })
 
     filter.watch((err, evt) => {
-      console.log(evt)
       let whitelist = this.state.tokenWhitelist
       let blacklist = this.state.tokenBlacklist;
 
       if (evt.event === 'AddedToWhitelist') {
         const idx = whitelist.indexOf(evt.args._addr)
         if (!idx || idx < 0) {
-          whitelist.push(evt.args._addr);
+          whitelist = whitelist.concat(evt.args._addr);
         }
       } else if (evt.event === 'RemovedFromWhitelist') {
-        const idx = whitelist.indexOf(evt.args._addr);
-        if (idx && idx >= 0) {
-          whitelist.splice(idx, 1)
-        }
+        whitelist = whitelist.filter(ele => ele !== evt.args._addr);
       } else if (evt.event === 'AddedToBlacklist') {
         const idx = blacklist.indexOf(evt.args._addr)
         if (!idx || idx < 0) {
-          blacklist.push(evt.args._addr);
+          blacklist = blacklist.concat(evt.args._addr);
         }
       } else if (evt.event === 'RemovedFromBlacklist') {
-        const idx = blacklist.indexOf(evt.args._addr);
-        if (idx && idx >= 0) {
-          blacklist.splice(idx, 1)
-        }
+        blacklist = blacklist.filter(ele => ele !== evt.args._addr);
       }
 
       this.setState({
