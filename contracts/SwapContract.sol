@@ -21,7 +21,7 @@ contract SwapContract is Ownable {
         uint index;
     }
 
-    uint256 private constant decimalFactor = 10**uint256(18);
+    uint256 private constant decimalUnit = 10**uint256(9);
     uint _numRequests;
     mapping (uint => TransferRequest) _requests;
 
@@ -112,7 +112,12 @@ contract SwapContract is Ownable {
         // ensure no zero address
         require(_txAddress != address(0));
 
+        // convert to 18 decimals
+        _amount = _amount.mul(decimalUnit);
+
+        // increment request count
         uint _requestId = _numRequests++;
+
         TransferRequest memory req = TransferRequest(
             _toAddress,
             _txAddress,

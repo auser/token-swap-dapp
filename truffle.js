@@ -1,3 +1,8 @@
+require('babel-register');
+require('babel-polyfill');
+
+if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
+
 const Wallet = require('ethereumjs-wallet')
 const WalletProvider = require('truffle-wallet-provider')
 const Web3 = require('web3')
@@ -6,9 +11,9 @@ const web3 = new Web3()
 let secrets = {}
 try {
   secrets = require('./secrets')
-} catch(err) {}
+} catch (err) {}
 
-const INFURA              = process.env.INFURA || secrets.infura
+const INFURA              = process.env.INFURA              || secrets.infura
 const MAINNET_PRIVATE_KEY = process.env.MAINNET_PRIVATE_KEY || secrets.mainnet
 const ROPSTEN_PRIVATE_KEY = process.env.ROPSTEN_PRIVATE_KEY || secrets.ropsten
 
