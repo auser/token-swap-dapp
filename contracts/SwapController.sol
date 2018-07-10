@@ -34,7 +34,7 @@ contract SwapController is Ownable, Pausable {
     }
 
     function canSwap(address addr) public view returns (bool) {
-        return swapEnabled() && !blacklist.isBlacklisted(addr);
+        return swapEnabled() && !isBlacklisted(addr);
     }
 
     function addToWhitelist(address addr) public onlyOwner {

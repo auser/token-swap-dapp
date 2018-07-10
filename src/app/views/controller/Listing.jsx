@@ -53,7 +53,7 @@ export class Listing extends React.Component {
 
         <form className="pure-form" onSubmit={this.handleSubmit}>
           <fieldset>
-            <legend>Add to swap whitelist</legend>
+            <legend>Add address to list</legend>
 
             <input
               type="text"
@@ -64,7 +64,7 @@ export class Listing extends React.Component {
             <button
               type="submit"
               className="pure-button pure-button-primary">
-                Add to swap whitelist
+                Add address to list
             </button>
           </fieldset>
         </form>
