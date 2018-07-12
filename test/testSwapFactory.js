@@ -2,14 +2,15 @@ const fs = require ('fs');
 const path = require ('path');
 const BigNumber = require ('bignumber.js');
 
-const th = require ('./testHelper');
+const th = require ('./lib/testHelper');
 const should = th.should ();
 const async = require ('async');
 
-const NewToken = artifacts.require ('NewToken');
+const ShopinToken = artifacts.require ('ShopinToken');
 const OriginalToken = artifacts.require('OriginalToken');
 const SwapContract = artifacts.require ('SwapContract');
-const SwapContractFactory = artifacts.require('SwapContractFactory');
+const SwapController = artifacts.require('SwapController');
+const SwapFactory = artifacts.require('SwapFactory');
 
 const totalSupply_ = 15e8 * 10 ** 18;
 const unlockTime_ =  +new Date() + 30;
@@ -23,15 +24,17 @@ contract (
     let totalSupply;
     let transferContract;
     let originalToken;
+    let controller;
     let factory;
 
     before (async () => await th.advanceBlock ());
     beforeEach ('initialize token and contract', async () => {
       // this.timeout (0); // disable timeout
       try {
-        tok = await NewToken.new (totalSupply_, unlockTime_, {from: owner});
+        tok = await ShopinToken.new (totalSupply_, unlockTime_, {from: owner});
         originalToken = await OriginalToken.new(totalSupply_, {from: owner});
-        factory = await SwapContractFactory.new(originalToken.address, owner, {from: syndicate});
+        controller = await SwapController.new({from: owner});
+        factory = await SwapFactory.new(originalToken.address, controller.address, owner, {from: syndicate});
       } catch(e) {
         console.log('e ->', e)
       }
@@ -43,11 +46,14 @@ contract (
     });
 
     it('does not allow invalid token address', async() =>{
-      await th.assertThrows(SwapContractFactory.new(0, owner, {from: syndicate}));
+      await th.assertThrows(SwapFactory.new(0, controller.address, owner, {from: syndicate}));
     });
-    it('does not allow invalid token owner address', async() =>{
-      await th.assertThrows(SwapContractFactory.new(originalToken.address, 0, {from: syndicate}));
+    it('does not allow invalid controller address', async() =>{
+      await th.assertThrows(SwapFactory.new(originalToken.address, 0, owner, {from: syndicate}));
     });
+    it('does not allow invalid owner address', async () => {
+      await th.assertThrows(SwapFactory.new(originalToken.address, controller.address, 0, {from: syndicate}));
+    })
 
     context('subcontracts', async () => {
       let contract;
@@ -77,11 +83,19 @@ contract (
       })
 
       it('can get a contract by its name', async () => {
-        const name = 'bob contract'
-        const one = await factory.insertContract(name);
+        const name = 'bobcontract'
+        await factory.insertContract(name);
         const evt = await factory.contractByNameExists(name);
 
         evt.should.be.true;
+      })
+
+      it('can get a contract index by its name', async () => {
+        const name = 'bobcontract'
+        await factory.insertContract(name)
+        const [found, index] = await factory.contractIndexForName(name)
+        found.should.be.true;
+        index.should.be.bignumber.equal(1);
       })
 
       it('can remove a contract', async () => {
