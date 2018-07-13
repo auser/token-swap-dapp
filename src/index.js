@@ -5,28 +5,20 @@ import ReactDOM from 'react-dom';
 import './utils/array';
 
 import App from './App';
-import Loading from './app/components/Loading';
-import loadContracts from './app/contracts';
 
-loadContracts ()
-  .then (contracts => {
-    const render = App =>
-      ReactDOM.render (
-        <App {...contracts} />,
-        document.getElementById ('root')
-      );
+const MOUNT = document.getElementById('root')
 
-    if (module.hot) {
-      module.hot.accept ('./App.js', () => {
-        const NewApp = require ('./App').default;
-        render (NewApp);
-      });
-    }
+const render = App =>
+  ReactDOM.render (
+    <App />,
+    MOUNT
+  );
 
-    render (App);
-  })
-  .catch (err => {
-    console.log ('An error occurred with web3', err);
+if (module.hot) {
+  module.hot.accept ('./App.js', () => {
+    const NewApp = require ('./App').default;
+    render (NewApp);
   });
+}
 
-ReactDOM.render (<Loading />, document.getElementById ('root'));
+render (App);

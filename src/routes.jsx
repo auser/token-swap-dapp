@@ -31,7 +31,7 @@ export const Routes = props => {
     </div>
   );
 
-  return (
+  const routes = (
     <BrowserRouter>
       <Switch>
         <Route path="/controller" render={render(ControllerView)} />
@@ -43,6 +43,8 @@ export const Routes = props => {
       </Switch>
     </BrowserRouter>
   );
+
+  return routes
 };
 
 export default Routes;

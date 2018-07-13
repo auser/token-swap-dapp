@@ -1,4 +1,5 @@
 import React from 'react';
+import {connect} from 'react-redux'
 // import { Link } from 'react-router-dom'
 
 import WhitelistedInstructions from '../../components/WhitelistedInstructions';
@@ -9,7 +10,6 @@ export class Syndicate extends React.Component {
     super (props);
 
     this.state = {
-      web3: null,
       ready: false,
       isWhitelisted: false,
       hasAccount: false,
@@ -58,4 +58,9 @@ export class Syndicate extends React.Component {
   }
 }
 
-export default Syndicate;
+const mapStateToProps = (state) => ({
+  accounts: state.accounts
+})
+
+export default connect(mapStateToProps)(Syndicate)
+
