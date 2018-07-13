@@ -2,4 +2,3 @@ node_modules
 build/
 build_webpack/
 secrets.js
-secrets.js
