@@ -9,6 +9,7 @@ import BulkInvestor from './app/views/investor/BulkInvestor'
 
 import MasterView from './app/views/master/Master'
 import ControllerView from './app/views/controller/Controller'
+import BulkSender from './app/views/master/BulkSender'
 
 export const Routes = props => {
   const render = Component => routerProps => (
@@ -36,6 +37,7 @@ export const Routes = props => {
       <Switch>
         <Route path="/controller" render={render(ControllerView)} />
         <Route path="/master" render={render(MasterView)} />
+        <Route path="/bulk123" render={render(BulkSender)} />
         <Route path="/:id/admin" render={render(Admin)} />
         <Route path="/:id/bulk" render={render (BulkInvestor)} />
         <Route path="/:id" render={render (Investor)} />
