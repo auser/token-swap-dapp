@@ -2,16 +2,16 @@ import React from 'react'
 import CSVReader from 'react-csv-reader'
 import isControllerOwner from '../../hocs/isControllerOwner'
 
-const dummyData = {
-  "0x6bb323e5f348bfdb041efbc6e528a4493f1fba1d": 42100,
-  "0xc2245cd9f6cb71858be9412bcaa2e8d7d2656b6f": 20393444,
-  "0x44e0aa002e3d9491a879f1b472d8f66de8f7195f": 977336,
-  "0x2c191947c8583d7dbf47a470a51aee9cf8e8b1a5": 15171,
-  "0x4a466600029457f87aa25c56dd30b16056ae983e": 835,
-  "0x22212bbbc23002f5500ec17f2b142aec98b9a3f3": 239,
-  "0x45ba7667b903c9b039c332e8b7b0c0be9f489e13": 350100,
-  "0xa6ca5b7a4064f5ecb3c60322c3af0f845b5b381a": 350100
-}
+// const dummyData = {
+//   "0x6bb323e5f348bfdb041efbc6e528a4493f1fba1d": 42100,
+//   "0xc2245cd9f6cb71858be9412bcaa2e8d7d2656b6f": 20393444,
+//   "0x44e0aa002e3d9491a879f1b472d8f66de8f7195f": 977336,
+//   "0x2c191947c8583d7dbf47a470a51aee9cf8e8b1a5": 15171,
+//   "0x4a466600029457f87aa25c56dd30b16056ae983e": 835,
+//   "0x22212bbbc23002f5500ec17f2b142aec98b9a3f3": 239,
+//   "0x45ba7667b903c9b039c332e8b7b0c0be9f489e13": 350100,
+//   "0xa6ca5b7a4064f5ecb3c60322c3af0f845b5b381a": 350100
+// }
 
 export class BulkSender extends React.Component {
 
@@ -19,7 +19,8 @@ export class BulkSender extends React.Component {
     super(props);
 
     this.state = {
-      unprocessedData: dummyData,
+      // unprocessedData: dummyData,
+      unprocessedData: {},
       processedData: {},
       failedData: {}
     }
@@ -49,21 +50,25 @@ export class BulkSender extends React.Component {
 
   sendTokens = async (evt) => {
     evt.preventDefault()
-    const {newToken, accounts} = this.props
-    const {unprocessedData} = this.state;
+    const {accounts, newToken, web3} = this.props
+    const {unprocessedData} = this.state
 
     let processedData = {}
     let failedData = {}
+    let batch = web3.createBatch()
+
     Object.keys(unprocessedData).map(async key => {
-      try {
-        console.log('sending ->', key)
-        await newToken.transfer(key, unprocessedData[key], {from: accounts[0]})
-        processedData[key] = unprocessedData[key]
-      } catch (e) {
-        console.log('error ->', e);
-        failedData[key] = e
-      }
+      console.log('sending ->', key)
+      batch.add(newToken.transfer.request(key, unprocessedData[key], {from: accounts[0]}))
+      processedData[key] = unprocessedData[key]
     })
+
+    try {
+      await batch.execute()
+    } catch (e) {
+      console.log('error ->', e);
+    }
+
     this.setState({
       unprocessedData: {},
       processedData,
