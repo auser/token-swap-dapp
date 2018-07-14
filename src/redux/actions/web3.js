@@ -1,51 +1,28 @@
 import * as constants from '../constants'
 // import getWeb3 from '../../utils/getWeb3'
 
-const networks = require('../../../truffle').networks
-const NODE_ENV = process.env.NODE_ENV
-
 export const Errors = {
   INCORRECT_NETWORK: 1
 }
 
-const detectNetwork = (web3) => new Promise((resolve, reject) => {
-  web3.version.getNetwork((err, netId) => {
-      err ? reject(err) : resolve(netId);
-  })
-})
-
-const isOnRightNetwork = (web3) => new Promise((resolve, reject) => {
-  detectNetwork(web3).then(net_id => {
-    if (NODE_ENV === 'development') {
-      net_id !== '1' && net_id !== '3' ? resolve() : reject()
-    } else if (NODE_ENV === 'production') {
-      net_id === '1' ? resolve() : reject()
-    } else if (NODE_ENV === 'ropsten') {
-      net_id === networks['ropsten'] ? resolve() : reject()
-    } else {
-      reject()
-    }
-  })
-})
-
 const fetchWeb3 = async (localProvider = null) => {
-  const Web3 = require('web3')
-  let web3 = window.web3
+  let {web3} = window
 
     // Checking if Web3 has been injected by the browser (Mist/MetaMask)
     if (typeof web3 !== 'undefined') {
+      const Web3 = require('web3')
+      let provider = null;
+
+      if (process.env.NODE_ENV === 'development') {
+        provider = new Web3.providers.HttpProvider('http://127.0.0.1:8545')
+      } else {
+        provider = web3.currentProvider
+      }
+      // const Web3 = require('web3')
       // Use Mist/MetaMask's provider.
-      web3 = new Web3(localProvider || web3.currentProvider)
-
-      return web3
+      return new Web3(provider)
     } else {
-      // Fallback to localhost if no web3 injection. We've configured this to
-      // use the development console's port by default.
-      const provider = new Web3.providers.HttpProvider('http://127.0.0.1:8545')
-
-      web3 = new Web3(provider)
-
-      return web3
+      return null
     }
 };
 
@@ -54,13 +31,9 @@ export const setWeb3 = web3 => ({
   payload: web3
 })
 
-export const setValidNetwork = bool => ({
-  type: constants.WEB3_GET_NETWORK,
-  payload: bool
-})
 
 export const setAccount = account => ({
-  type: constants.WEB3_GET_ACCOUNT,
+  type: constants.WEB3_SET_ACCOUNT,
   payload: account
 })
 
@@ -72,19 +45,9 @@ export const loadWeb3 = () => async (dispatch, getState) => {
         type: constants.WEB3_LOADING_COMPLETE,
         payload: web3
       })
-      try {
-        await isOnRightNetwork(web3)
-        dispatch({
-          type: constants.WEB3_NETWORK_CORRECT
-        })
-      } catch (e) {
-        dispatch({
-          type: constants.WEB3_NETWORK_INCORRECT
-        })
-      }
     } else {
       dispatch({
-        type: constants.WEB3_LOADING_ERROR
+        type: constants.WEB3_NOT_INSTALLED
       })
     }
   })
@@ -113,4 +76,36 @@ export const loadWeb3Account = () => async (dispatch, getState) => {
       }
     })
   }
+}
+
+export const checkNetwork = (requiredNetwork = '1') => async (dispatch, getState) => {
+  dispatch({type: constants.WEB3_CHECKING_NETWORK})
+  const {web3} = getState();
+
+  web3.web3.version.getNetwork((err, currentNetworkId) => {
+    if (err) {
+      dispatch({type: constants.WEB3_INVALID_NETWORK})
+    } else {
+
+      const changedNetwork = web3.currentNetworkId !== currentNetworkId;
+
+      if (changedNetwork) {
+        const onCorrectNetwork = requiredNetwork === '*' ?
+          (currentNetworkId !== '1' && currentNetworkId !== '3') :
+          requiredNetwork === currentNetworkId;
+
+        if (onCorrectNetwork) {
+          dispatch({
+            type: constants.WEB3_VALID_NETWORK,
+            payload: currentNetworkId
+          })
+        } else {
+          dispatch({
+            type: constants.WEB3_INVALID_NETWORK,
+            payload: currentNetworkId
+          })
+        }
+      }
+    }
+  })
 }

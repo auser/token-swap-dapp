@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const IncorrectNetwork = (props) => (
+export const UnlockMetamask = (props) => (
   <div className="App">
       <nav className="navbar pure-menu pure-menu-horizontal">
         <a className="logo" href="https://shopin.com">
@@ -12,13 +12,12 @@ export const IncorrectNetwork = (props) => (
         </a>
       </nav>
       <main className="container">
-        <h1>Incorrect Network</h1>
-          <h3>{process.env.NODE_ENV}</h3>
+        <h1>Please unlock metamask</h1>
         <p>
-          Please change the network in metamask to the mainnet and then reload this page.
+          In order to run this application, you'll need to unlock your metamask account.
         </p>
       </main>
     </div>
 )
 
-export default IncorrectNetwork
+export default UnlockMetamask

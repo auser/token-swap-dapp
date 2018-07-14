@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const IncorrectNetwork = (props) => (
+export const InstallMetamask = (props) => (
   <div className="App">
       <nav className="navbar pure-menu pure-menu-horizontal">
         <a className="logo" href="https://shopin.com">
@@ -12,13 +12,12 @@ export const IncorrectNetwork = (props) => (
         </a>
       </nav>
       <main className="container">
-        <h1>Incorrect Network</h1>
-          <h3>{process.env.NODE_ENV}</h3>
+        <h1>Install metamask</h1>
         <p>
-          Please change the network in metamask to the mainnet and then reload this page.
+          This application requires you to have <a href="https://metamask.io">MetaMask</a> installed. In order to install it, visit <a href="https://metamask.io">https://metamask.io</a> and then return back here.
         </p>
       </main>
     </div>
 )
 
-export default IncorrectNetwork
+export default InstallMetamask

@@ -1,55 +1,79 @@
 import * as constants from '../constants'
 
 const initialState = {
-  loaded: false,
+  checkingForWeb3: true,
   web3: null,
-  correctNetwork: null,
+  checkingNetwork: true,
+  validNetwork: false,
+  currentNetwork: '0',
   accounts: null,
-  metamaskUnlocked: true
+  metamaskUnlocked: true,
+  hasMetamaskInstalled: false,
+  hasLoadedAccounts: false,
 }
 export const web3Reducer = (state = initialState, action) => {
   switch (action.type) {
-    case constants.WEB3_GET_WEB3:
+    case constants.WEB3_LOAD_WEB3:
       return {
         ...state,
-        web3: action.payload
+        checkingForWeb3: true,
       }
     case constants.WEB3_LOADING_COMPLETE:
       return {
         ...state,
-        loaded: true,
-        web3: action.payload
+        checkingForWeb3: false,
+        web3: action.payload,
+        hasMetamaskInstalled: true,
       }
-    case constants.WEB3_LOADING_ERROR:
+    case constants.WEB3_NOT_INSTALLED:
       return {
         ...state,
-        loaded: false,
+        checkingForWeb3: false,
+        hasMetamaskInstalled: false
+      }
+    case constants.WEB3_LOAD_ACCOUNTS:
+      return {
+        ...state,
+        hasLoadedAcconts: false,
+        accounts: []
       }
     case constants.WEB3_LOAD_ACCOUNTS_COMPLETE:
       return {
         ...state,
         accounts: action.payload,
-        metamaskUnlocked: true
+        currentAccount: action.payload[0],
+        hasLoadedAccounts: true,
+        // metamaskUnlocked: true
       }
     case constants.WEB3_LOAD_ACCOUNTS_ERROR:
       return {
         ...state,
-        loadAccountsError: action.payload
+        hasLoadedAccounts: false,
+        loadAccountsError: action.payload,
       }
     case constants.WEB3_LOAD_ACCOUNTS_NEEDS_UNLOCK:
       return {
         ...state,
         metamaskUnlocked: false
       }
-    case constants.WEB3_NETWORK_CORRECT:
+    case constants.WEB3_CHECKING_NETWORK:
       return {
         ...state,
-        correctNetwork: true
+        checkingNetwork: true
       }
-    case constants.WEB3_NETWORK_INCORRECT:
+    case constants.WEB3_VALID_NETWORK:
       return {
         ...state,
-        correctNetwork: false
+        currentNetworkId: action.payload,
+        checkingNetwork: false,
+        validNetwork: true
+      }
+    case constants.WEB3_INVALID_NETWORK:
+      return {
+        ...state,
+        currentNetworkId: action.payload,
+        checkingNetwork: false,
+        validNetwork: false
       }
     default:
       return state

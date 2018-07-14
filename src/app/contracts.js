@@ -2,7 +2,6 @@ import ERC20 from '../../build/contracts/ERC20.json';
 import SwapFactory from '../../build/contracts/SwapFactory.json';
 import SwapContract from '../../build/contracts/SwapContract.json';
 import SwapController from '../../build/contracts/SwapController.json';
-import getWeb3 from '../utils/getWeb3';
 import ShopinToken from '../../build/contracts/ShopinToken.json'
 
 const contract = require ('truffle-contract');
@@ -31,10 +30,9 @@ export const isOnRightNetwork = (web3) => new Promise((resolve, reject) => {
   })
 })
 
-export const loadContracts = () =>
+export const loadContracts = (web3) =>
   new Promise ((resolve, reject) => {
 
-    getWeb3.then (({web3}) => {
       const factoryDef = contract (SwapFactory);
       const controllerDef = contract (SwapController);
       const swapContractDef = contract (SwapContract);
@@ -47,42 +45,29 @@ export const loadContracts = () =>
       tokenContractDef.setProvider (web3.currentProvider);
       newtokenDef.setProvider(web3.currentProvider);
 
-      // Get accounts.
-      web3.eth.getAccounts (async (error, accounts) => {
-        if (error) {
-          reject (error);
+      Promise.all([
+        controllerDef.at (
+          process.env.REACT_APP_CONTROLLER_ADDRESS
+        ),
+        factoryDef.at (process.env.REACT_APP_FACTORY_ADDRESS),
+        tokenContractDef.at (
+          process.env.REACT_APP_TOKEN_ADDRESS
+        ),
+        newtokenDef.at(
+          process.env.REACT_APP_NEW_TOKEN_ADDRESS
+        )
+      ]).then(([controller, factory, token, newToken]) => {
+        return {
+          controller,
+          factory,
+          token,
+          newToken,
+          SwapContract: swapContractDef,
+          web3,
         }
-
-        isOnRightNetwork(web3)
-        .then(() => {
-          Promise.all([
-            controllerDef.at (
-              process.env.REACT_APP_CONTROLLER_ADDRESS
-            ),
-            factoryDef.at (process.env.REACT_APP_FACTORY_ADDRESS),
-            tokenContractDef.at (
-              process.env.REACT_APP_TOKEN_ADDRESS
-            ),
-            newtokenDef.at(
-              process.env.REACT_APP_NEW_TOKEN_ADDRESS
-            )
-          ]).then(([controller, factory, token, newToken]) => {
-            return {
-              accounts,
-              controller,
-              factory,
-              token,
-              newToken,
-              SwapContract: swapContractDef,
-              web3,
-            }
-          })
-        .then(resolve)
-        .catch(reject)
-        })
-        .catch(() => reject(Errors.INCORRECT_NETWORK))
-      });
-    });
+      })
+    .then(resolve)
+    .catch(reject)
   });
 
 export default loadContracts;

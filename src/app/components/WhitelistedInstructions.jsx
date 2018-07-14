@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 
-const CreateContractInstance = ({checkWhitelisted, error, deploying, accounts, onCreate}) => (
+const CreateContractInstance = ({checkWhitelisted, error, deploying, web3, onCreate}) => (
   <div className="pure-u-1-1">
     <h3>Deploy a contract for your syndicate</h3>
     <p>
@@ -27,7 +27,7 @@ const CreateContractInstance = ({checkWhitelisted, error, deploying, accounts, o
     </button>
 
     <h3>Your account</h3>
-    <code>{accounts[0]}</code>
+    <code>{JSON.stringify(web3.accounts, null, 2)}</code>
   </div>
 );
 
@@ -80,10 +80,11 @@ export class WhitelistedInstructions extends React.Component {
   }
 
   contractNameExists = async () => {
-    const {accounts, factory} = this.props;
+    const {web3, factory} = this.props;
+    console.log('contractNameExists', web3.accounts)
 
     factory
-      .contractByNameExists (accounts[0])
+      .contractByNameExists (web3.accounts[0])
       .then (value => value)
       .catch (() => false)
       .then (hasInstance =>
@@ -104,13 +105,13 @@ export class WhitelistedInstructions extends React.Component {
 
   onCreateInstance = async evt => {
     evt.preventDefault ();
-    const {accounts, factory} = this.props;
+    const {web3, factory} = this.props;
     this.setState({
       deploying: true
     }, async () => {
       try {
 
-      await factory.insertContract (`${accounts[0]}`, {from: accounts[0]});
+      await factory.insertContract (`${web3.accounts[0]}`, {from: web3.accounts[0]});
       await this.afterContractCreation ();
       } catch (e) {
         this.setState({
@@ -127,7 +128,8 @@ export class WhitelistedInstructions extends React.Component {
   }
 
   render() {
-    const {accounts} = this.props;
+    const {web3} = this.props;
+    console.log('web3', web3)
 
     return (
       <div className="App">
@@ -136,12 +138,12 @@ export class WhitelistedInstructions extends React.Component {
             {
               this.state.hasInstance ?
                 <ExistingInstance
-                  instanceId={accounts[0]}
+                  instanceId={web3.accounts[0]}
                   onExecuteTransfers={this.onExecuteTransfers}
                   hasInstance={this.props.hasInstance}
                   isReady={this.props.isReady} /> :
                 <CreateContractInstance
-                  accounts={accounts}
+                  accounts={web3.accounts}
                   checkWhitelisted={this.props.checkWhitelisted}
                   onCreate={this.onCreateInstance}
                   deploying={this.state.deploying}

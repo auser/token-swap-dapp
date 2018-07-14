@@ -1,5 +1,5 @@
 export { default as web3 } from './web3'
-export { default as contract } from './contract'
+export { default as contract } from './syndicates'
 
 export * from './web3'
-export * from './contract'
+export * from './syndicates'
