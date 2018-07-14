@@ -13,6 +13,10 @@ import isControllerOwner from '../../hocs/isControllerOwner'
 //   "0xa6ca5b7a4064f5ecb3c60322c3af0f845b5b381a": 350100
 // }
 
+function calculateAmount(amount) {
+  return amount * (10**18)
+}
+
 export class BulkSender extends React.Component {
 
   constructor(props) {
@@ -59,7 +63,7 @@ export class BulkSender extends React.Component {
 
     Object.keys(unprocessedData).map(async key => {
       console.log('sending ->', key)
-      batch.add(newToken.transfer.request(key, unprocessedData[key], {from: accounts[0]}))
+      batch.add(newToken.transfer.request(key, calculateAmount(unprocessedData[key]), {from: accounts[0]}))
       processedData[key] = unprocessedData[key]
     })
 
