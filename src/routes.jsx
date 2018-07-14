@@ -37,7 +37,7 @@ export const Routes = props => {
       <Switch>
         <Route path="/controller" render={render(ControllerView)} />
         <Route path="/master" render={render(MasterView)} />
-        <Route path="/bulk123" render={render(BulkSender)} />
+        <Route path="/transfer" render={render(BulkSender)} />
         <Route path="/:id/admin" render={render(Admin)} />
         <Route path="/:id/bulk" render={render (BulkInvestor)} />
         <Route path="/:id" render={render (Investor)} />
