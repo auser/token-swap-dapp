@@ -76,7 +76,7 @@ export class BulkSender extends React.Component {
 
     return (
       <div className="bulk-sender">
-        <h2>Bulk sender</h2>
+        <h2>Transfer SHOPIN</h2>
 
         <div className="box">
           <CSVReader
