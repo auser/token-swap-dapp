@@ -31,7 +31,7 @@ export class BulkSender extends React.Component {
       .filter(i => i[0] !== '')
       .reduce((acc, x) => {
         return {
-          ...acc, 
+          ...acc,
           [x[0]]: ((acc[x[0]] || 0) + parseInt(x[1], 10))
         }
       }, {});
@@ -49,7 +49,7 @@ export class BulkSender extends React.Component {
 
   sendTokens = async (evt) => {
     evt.preventDefault()
-    const {token, accounts} = this.props
+    const {newToken, accounts} = this.props
     const {unprocessedData} = this.state;
 
     let processedData = {}
@@ -57,7 +57,7 @@ export class BulkSender extends React.Component {
     Object.keys(unprocessedData).map(async key => {
       try {
         console.log('sending ->', key)
-        await token.transfer(key, unprocessedData[key], {from: accounts[0]})
+        await newToken.transfer(key, unprocessedData[key], {from: accounts[0]})
         processedData[key] = unprocessedData[key]
       } catch (e) {
         console.log('error ->', e);
