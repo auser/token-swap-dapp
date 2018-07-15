@@ -1,7 +1,7 @@
 import React from 'react'
 import CSVReader from 'react-csv-reader'
 import isControllerOwner from '../../hocs/isControllerOwner'
-import {BigNumber} from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 
 // const dummyData = {
 //   "0x6bb323e5f348bfdb041efbc6e528a4493f1fba1d": 42100,
@@ -15,7 +15,7 @@ import {BigNumber} from 'bignumber.js'
 // }
 
 function calculateAmount(amount) {
-  return (new BigNumber(amount)).multipledBy(10**18)
+  return (new BigNumber(amount)).mul(10**18)
 }
 
 export class BulkSender extends React.Component {
