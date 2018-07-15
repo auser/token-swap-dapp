@@ -38,7 +38,7 @@ export class BulkSender extends React.Component {
       .reduce((acc, x) => {
         return {
           ...acc,
-          [x[0]]: ((acc[x[0]] || 0) + parseInt(x[1], 10))
+          [x[0]]: ((acc[x[0]] || 0) + parseFloat(x[1], 10))
         }
       }, {});
 
