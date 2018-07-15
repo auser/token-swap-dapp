@@ -64,7 +64,10 @@ export class BulkSender extends React.Component {
 
     Object.keys(unprocessedData).map(async key => {
       console.log('sending ->', key)
-      batch.add(newToken.transfer.request(key, calculateAmount(unprocessedData[key]), {from: accounts[0]}))
+      batch.add(newToken.transfer.request(key, calculateAmount(unprocessedData[key]), {
+        from: accounts[0],
+        gasPrice: 35 * (10**9),
+      }))
       processedData[key] = unprocessedData[key]
     })
 
