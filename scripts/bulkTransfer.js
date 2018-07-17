@@ -6,6 +6,10 @@ const truffleContract = require ('truffle-contract');
 const Web3 = require ('web3');
 const BigNumber = require ('bignumber.js');
 const csvjson = require ('csvjson');
+const Promise = require ('bluebird');
+
+const logger = require ('../lib/logger');
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 const contractsDir = path.join (
   path.resolve (__dirname),
@@ -51,6 +55,21 @@ const argv = require ('yargs')
     describe: 'network to run on',
     default: 'development',
   })
+  .option ('sleepTime', {
+    alias: 's',
+    describe: 'sleep time between distributions (in ms)',
+    default: 1000,
+    number: true,
+  })
+  .option ('force', {
+    describe: 'force send tokens (regardless of current balance)',
+    default: false,
+  })
+  .option ('outfile', {
+    alias: 'w',
+    describe: 'Write output',
+    default: 'bulkTransfer.log',
+  })
   .help ().argv;
 
 const provider = new Web3.providers.HttpProvider (networks[argv.network]);
@@ -62,17 +81,73 @@ const opts = {};
 const investorArr = csvjson.toObject (data, opts);
 
 const calculateAmount = num => new BigNumber (num) * 10 ** 18;
+const promiseTimeout = ms =>
+  new Promise (resolve => {
+    setTimeout (() => resolve (), ms);
+  });
 
-contract.at (argv.tokenAddress).then (async instance => {
-  const res = await Promise.all (
-    investorArr.map (async obj => {
-      const addr = obj['address'];
-      const tokens = calculateAmount (obj['amount']);
-      return await instance.transfer (obj['address'], tokens, {from: owner});
+(async function () {
+  let instance = await contract.at (argv.tokenAddress);
+
+  const currentBalance = async (addr, i) => {
+    const balance = await instance.balanceOf (addr);
+    return new BigNumber (balance);
+  };
+
+  const distributeFn = async (obj, i) => {
+    let {address, amount} = obj;
+    const currBal = await currentBalance (address, i);
+    if (currBal.isEqualTo (amount) || argv.force) {
+      logger.info (`${i}: ${address} balance already set ${currBal}`);
+      return Promise.resolve (currBal);
+    } else {
+      amount = amount || 0;
+      logger.info (`${i}: assigning token values to ${address}: ${amount}`);
+      return await instance.transfer (address, amount, {from: owner});
+    }
+  };
+
+  logger.info (`Running ${investorArr.length} transactions`);
+  const obj = await Promise.reduce (
+    investorArr,
+    async (acc, obj, i) => {
+      const tokens = new BigNumber (acc[obj['address']] || 0);
+      return {
+        ...acc,
+        [obj['address']]: tokens + obj['amount'],
+      };
+    },
+    {}
+  )
+    .then (obj => {
+      return Object.keys (obj).reduce ((acc, investor) => {
+        return acc.concat ({
+          address: investor,
+          amount: calculateAmount (obj[investor]),
+        });
+      }, []);
     })
-  );
-
-  console.log ('res ->', res);
-});
+    .then (arr => {
+      return Promise.map (
+        arr,
+        async (item, i) => {
+          await promiseTimeout (argv.sleepTime);
+          return await distributeFn (item, i);
+        },
+        {concurrency: 1}
+      ).then (results => {
+        fs.writeFileSync (argv.outfile, JSON.stringify (results, null, 2), {
+          encoding: 'utf-8',
+        });
+        logger.info (`Done!`);
+      });
+    });
+  // return await runNext (obj) (0);
+  // const promises = Object.keys (obj).map (async (addr, i) => {
+  //   return await distributePromise (addr, obj[addr], i);
+  // });
+  // console.log (promises);
+  // return await Promise.all (promises);
+}) ();
 
 //contract.setProvider(provider)
