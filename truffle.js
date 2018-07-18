@@ -28,7 +28,7 @@ var ropstenPrivateKey = new Buffer (ROPSTEN_PRIVATE_KEY, 'hex');
 var ropstenWallet = Wallet.fromPrivateKey (ropstenPrivateKey);
 var ropstenProvider = new WalletProvider (
   ropstenWallet,
-  `https://ropsten.infura.io/{INURA}`
+  `https://ropsten.infura.io/${INFURA}`
 );
 
 module.exports = {

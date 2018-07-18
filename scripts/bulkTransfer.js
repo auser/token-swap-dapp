@@ -7,6 +7,7 @@ const Web3 = require ('web3');
 const BigNumber = require ('bignumber.js');
 const csvjson = require ('csvjson');
 const Promise = require ('bluebird');
+const tx = require ('ethereumjs-tx');
 
 const logger = require ('../lib/logger');
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -25,12 +26,21 @@ try {
   secrets = require ('../secrets');
 } catch (err) {}
 
+const truffleConfig = require ('../truffle');
 const INFURA = process.env.INFURA || secrets.infura;
 
 const networks = {
   development: 'http://localhost:8545',
-  ropsten: `https://ropsten.infura.io/${INFURA}`,
-  mainnet: `https://mainnet.infura.io/${INFURA}`,
+  ropsten: `https://ropsten.infura.io/v3/${INFURA}`,
+  mainnet: `https://mainnet.infura.io/v3/${INFURA}`,
+};
+
+const MAINNET_PRIVATE_KEY = process.env.MAINNET_PRIVATE_KEY || secrets.mainnet;
+const ROPSTEN_PRIVATE_KEY = process.env.ROPSTEN_PRIVATE_KEY || secrets.ropsten;
+
+const privateKeys = {
+  ropsten: new Buffer (ROPSTEN_PRIVATE_KEY, 'hex'),
+  mainnet: new Buffer (MAINNET_PRIVATE_KEY, 'hex'),
 };
 
 const contract = truffleContract (ShopinToken);
@@ -58,7 +68,7 @@ const argv = require ('yargs')
   .option ('sleepTime', {
     alias: 's',
     describe: 'sleep time between distributions (in ms)',
-    default: 1000,
+    default: 2000,
     number: true,
   })
   .option ('force', {
@@ -74,6 +84,13 @@ const argv = require ('yargs')
 
 const provider = new Web3.providers.HttpProvider (networks[argv.network]);
 contract.setProvider (provider);
+
+const networkName = argv.network !== 'mainnet' && argv.network !== 'ropsten'
+  ? 'development'
+  : argv.network;
+
+const networkConfig = truffleConfig.networks[networkName];
+const web3 = new Web3 (provider);
 
 const owner = argv.owner;
 const data = fs.readFileSync (argv.csvfile, {encoding: 'utf-8'});
@@ -97,6 +114,35 @@ const promiseTimeout = ms =>
 (async function () {
   let instance = await contract.at (argv.tokenAddress);
 
+  const sendRawTransfer = async (to, amount) => {
+    if (networkName === 'development') {
+      return instance.transfer (address, amount, {from: owner});
+    } else {
+      const data = instance.contract.transfer.getData (to, amount, {
+        from: owner,
+      });
+      const opts = {
+        from: owner,
+        gasLimit: web3.toHex (networkConfig.gas || 800000),
+        gasPrice: web3.toHex (networkConfig.gasPrice || 20000000000),
+        to: argv.tokenAddress,
+        value: web3.toHex (0),
+        chainId: web3.toHex (web3.version.network),
+        nonce: web3.toHex (web3.eth.getTransactionCount (owner) + 1),
+        data,
+      };
+      const transaction = new tx (opts);
+
+      transaction.sign (privateKeys[networkName]);
+      const serializedKey = transaction.serialize ().toString ('hex');
+      return new Promise ((resolve, reject) => {
+        web3.eth.sendRawTransaction ('0x' + serializedKey, (err, res) => {
+          err ? reject (err) : resolve (res);
+        });
+      });
+    }
+  };
+
   const currentBalance = async (addr, i) => {
     try {
       const balance = await instance.balanceOf (addr);
@@ -115,7 +161,8 @@ const promiseTimeout = ms =>
     } else {
       amount = amount || 0;
       logger.info (`${i}: assigning token values to ${address}: ${amount}`);
-      return await instance.transfer (address, amount, {from: owner});
+      // return await instance.transfer (address, amount, {from: owner});
+      return await sendRawTransfer (address, amount);
     }
   };
 
