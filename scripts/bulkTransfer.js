@@ -22,7 +22,7 @@ const ShopinToken = require (path.join (contractsDir, 'ShopinToken.json'));
 
 let secrets = {};
 try {
-  secrets = require ('./secrets');
+  secrets = require ('../secrets');
 } catch (err) {}
 
 const INFURA = process.env.INFURA || secrets.infura;
@@ -74,6 +74,8 @@ const argv = require ('yargs')
 
 const provider = new Web3.providers.HttpProvider (networks[argv.network]);
 contract.setProvider (provider);
+
+logger.info (`Running on network: ${networks[argv.network]}`);
 
 const owner = argv.owner;
 const data = fs.readFileSync (argv.csvfile, {encoding: 'utf-8'});
