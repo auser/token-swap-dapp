@@ -29,8 +29,8 @@ const INFURA = process.env.INFURA || secrets.infura;
 
 const networks = {
   development: 'http://localhost:8545',
-  ropsten: `https://ropsten.infura.io/${INFURA}`,
-  mainnet: `https://mainnet.infura.io/${INFURA}`,
+  ropsten: `https://ropsten.infura.io/v3/${INFURA}`,
+  mainnet: `https://mainnet.infura.io/v3/${INFURA}`,
 };
 
 const contract = truffleContract (ShopinToken);
@@ -75,12 +75,18 @@ const argv = require ('yargs')
 const provider = new Web3.providers.HttpProvider (networks[argv.network]);
 contract.setProvider (provider);
 
-logger.info (`Running on network: ${networks[argv.network]}`);
-
 const owner = argv.owner;
 const data = fs.readFileSync (argv.csvfile, {encoding: 'utf-8'});
 const opts = {};
 const investorArr = csvjson.toObject (data, opts);
+
+logger.info (`
+Bulk transfer
+  Running on network: ${networks[argv.network]}
+  Running over ${investorArr.length} transfers
+  Contract: ${argv.tokenAddress}
+  Token owner: ${owner}
+`);
 
 const calculateAmount = num => new BigNumber (num) * 10 ** 18;
 const promiseTimeout = ms =>
@@ -92,8 +98,12 @@ const promiseTimeout = ms =>
   let instance = await contract.at (argv.tokenAddress);
 
   const currentBalance = async (addr, i) => {
-    const balance = await instance.balanceOf (addr);
-    return new BigNumber (balance);
+    try {
+      const balance = await instance.balanceOf (addr);
+      return new BigNumber (balance);
+    } catch (e) {
+      console.error ('ERROR loading balance: ', e);
+    }
   };
 
   const distributeFn = async (obj, i) => {
