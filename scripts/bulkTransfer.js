@@ -114,7 +114,7 @@ const promiseTimeout = ms =>
 (async function () {
   let instance = await contract.at (argv.tokenAddress);
 
-  const sendRawTransfer = async (to, amount) => {
+  const sendRawTransfer = async (i, to, amount) => {
     if (networkName === 'development') {
       return instance.transfer (address, amount, {from: owner});
     } else {
@@ -128,7 +128,7 @@ const promiseTimeout = ms =>
         to: argv.tokenAddress,
         value: web3.toHex (0),
         chainId: web3.toHex (web3.version.network),
-        nonce: web3.toHex (web3.eth.getTransactionCount (owner) + 1),
+        nonce: web3.toHex (web3.eth.getTransactionCount (owner) + i),
         data,
       };
       const transaction = new tx (opts);
@@ -162,7 +162,7 @@ const promiseTimeout = ms =>
       amount = amount || 0;
       logger.info (`${i}: assigning token values to ${address}: ${amount}`);
       // return await instance.transfer (address, amount, {from: owner});
-      return await sendRawTransfer (address, amount);
+      return await sendRawTransfer (i, address, amount);
     }
   };
 
