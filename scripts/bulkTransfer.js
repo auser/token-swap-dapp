@@ -9,6 +9,7 @@ const csvjson = require ('csvjson');
 const Promise = require ('bluebird');
 const tx = require ('ethereumjs-tx');
 
+const getTransactionReceiptMined = require ('../lib/getTransactionReceiptMined');
 const logger = require ('../lib/logger');
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -118,29 +119,76 @@ const promiseTimeout = ms =>
     if (networkName === 'development') {
       return instance.transfer (address, amount, {from: owner});
     } else {
+      const latestBlock = await web3.eth.getBlock ('latest');
+      const latestNonce = await web3.eth.getTransactionCount (owner);
+
       const data = instance.contract.transfer.getData (to, amount, {
         from: owner,
       });
+      // from: owner,
+      const gasPrice = web3.eth.gasPrice;
+      const gasLimit = web3.eth.getBlock ('latest').gasLimit;
+      const gasPriceHex = web3.toHex (gasPrice);
+      const gasLimitHex = web3.toHex (gasLimit);
+
       const opts = {
-        from: owner,
-        gasLimit: web3.toHex (networkConfig.gas || 800000),
-        gasPrice: web3.toHex (networkConfig.gasPrice || 20000000000),
+        gasLimit: gasLimitHex,
+        gasPrice: gasPriceHex,
         to: argv.tokenAddress,
+        from: owner,
         value: web3.toHex (0),
         chainId: web3.toHex (web3.version.network),
-        nonce: web3.toHex (web3.eth.getTransactionCount (owner) + i),
-        data,
+        nonce: latestNonce + 1,
+        data: data,
       };
+      console.log (opts);
       const transaction = new tx (opts);
 
       transaction.sign (privateKeys[networkName]);
-      const serializedKey = transaction.serialize ().toString ('hex');
+      const serializedTxn = transaction.serialize ().toString ('hex');
       return new Promise ((resolve, reject) => {
-        web3.eth.sendRawTransaction ('0x' + serializedKey, (err, res) => {
-          err ? reject (err) : resolve (res);
+        // const rawTxnHash = web3.sha3 (serializedKey, {encoding: 'hex'});
+        web3.eth.sendRawTransaction ('0x' + serializedTxn, (err, res) => {
+          if (err) {
+            return reject (err);
+          } else {
+            return resolve (res);
+          }
+          // err ? reject (err) : resolve (res);
         });
       });
     }
+  };
+
+  const awaitConsensus = async function (txhash) {
+    return getTransactionReceiptMined (web3, txhash, {
+      interval: 500,
+      ensureNotUncle: false,
+    });
+    // const deferred = Promise.pending ();
+    // const filter = web3.eth.filter ('latest');
+    // filter.watch (async (err, res) => {
+    //   console.log ('watch ', err, res);
+    //   web3.eth.getTransactionReceipt (txhash, (err, receipt) => {
+    //     console.log ('get transaction receipt', err, receipt);
+    //     if (receipt && receipt.transactionHash == txhash) {
+    //       filter.stopWatching ();
+    //       deferred.resolve (receipt);
+    //     }
+    //   });
+    // });
+    // deferred.promise.timeout (60000).catch (err => {
+    //   console.error ('Oh no! We could not get the block mined');
+    //   process.exit (1);
+    // });
+    // return deferred.promise;
+    // return new Promise ((resolve, reject) => {
+    //   web3.eth.getTransactionReceipt (txhash, async (err, res) => {
+    //     console.log ('err, err', err, res);
+    //     await promiseTimeout (argv.sleepTime);
+    //     err || !res ? awaitConsensus (txhash).then (resolve) : resolve (res);
+    //   });
+    // });
   };
 
   const currentBalance = async (addr, i) => {
@@ -157,7 +205,7 @@ const promiseTimeout = ms =>
     const currBal = await currentBalance (address, i);
     if (currBal.isEqualTo (amount) || argv.force) {
       logger.info (`${i}: ${address} balance already set ${currBal}`);
-      return Promise.resolve (currBal);
+      return Promise.resolve ();
     } else {
       amount = amount || 0;
       logger.info (`${i}: assigning token values to ${address}: ${amount}`);
@@ -187,11 +235,16 @@ const promiseTimeout = ms =>
       }, []);
     })
     .then (arr => {
-      return Promise.map (
+      return Promise.mapSeries (
         arr,
         async (item, i) => {
-          await promiseTimeout (argv.sleepTime);
-          return await distributeFn (item, i);
+          const res = await distributeFn (item, i);
+          if (res) {
+            await promiseTimeout (argv.sleepTime);
+            await awaitConsensus (res);
+          }
+          console.log (res);
+          return res;
         },
         {concurrency: 1}
       ).then (results => {
