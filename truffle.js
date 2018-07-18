@@ -21,14 +21,14 @@ var mainnetPrivateKey = new Buffer (MAINNET_PRIVATE_KEY, 'hex');
 var mainnetWallet = Wallet.fromPrivateKey (mainnetPrivateKey);
 var mainnetProvider = new WalletProvider (
   mainnetWallet,
-  `https://mainnet.infura.io/v3/${INFURA}`
+  `https://mainnet.infura.io/${INFURA}`
 );
 
 var ropstenPrivateKey = new Buffer (ROPSTEN_PRIVATE_KEY, 'hex');
 var ropstenWallet = Wallet.fromPrivateKey (ropstenPrivateKey);
 var ropstenProvider = new WalletProvider (
   ropstenWallet,
-  `https://ropsten.infura.io/v3/{INURA}`
+  `https://ropsten.infura.io/{INURA}`
 );
 
 module.exports = {
