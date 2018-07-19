@@ -4,16 +4,16 @@ import isControllerOwner from '../../hocs/isControllerOwner';
 import BigNumber from 'bignumber.js';
 import Promise from 'bluebird';
 
-const dummyData = {
-  '0x6bb323e5f348bfdb041efbc6e528a4493f1fba1d': 42100,
-  '0xc2245cd9f6cb71858be9412bcaa2e8d7d2656b6f': 20393444,
-  // '0x44e0aa002e3d9491a879f1b472d8f66de8f7195f': 977336,
-  // '0x2c191947c8583d7dbf47a470a51aee9cf8e8b1a5': 15171,
-  // '0x4a466600029457f87aa25c56dd30b16056ae983e': 835,
-  // '0x22212bbbc23002f5500ec17f2b142aec98b9a3f3': 239,
-  // '0x45ba7667b903c9b039c332e8b7b0c0be9f489e13': 350100,
-  // '0xa6ca5b7a4064f5ecb3c60322c3af0f845b5b381a': 350100,
-};
+// const dummyData = {
+// '0x6bb323e5f348bfdb041efbc6e528a4493f1fba1d': 42100,
+// '0xc2245cd9f6cb71858be9412bcaa2e8d7d2656b6f': 20393444,
+// '0x44e0aa002e3d9491a879f1b472d8f66de8f7195f': 977336,
+// '0x2c191947c8583d7dbf47a470a51aee9cf8e8b1a5': 15171,
+// '0x4a466600029457f87aa25c56dd30b16056ae983e': 835,
+// '0x22212bbbc23002f5500ec17f2b142aec98b9a3f3': 239,
+// '0x45ba7667b903c9b039c332e8b7b0c0be9f489e13': 350100,
+// '0xa6ca5b7a4064f5ecb3c60322c3af0f845b5b381a': 350100,
+// };
 
 function calculateAmount (amount) {
   return new BigNumber (amount) * 10 ** 18;
@@ -31,27 +31,30 @@ const ProcessingTransactions = ({processingTransactions, currentBalances}) => {
             <th>etherscan tx</th>
             <th>Amount sending</th>
             <th>current balance</th>
+            <th>confirmations</th>
           </tr>
         </thead>
         <tbody>
-          {Object.keys (processingTransactions).map (key => {
-            const {logs} = processingTransactions[key];
+          {Object.keys (processingTransactions).map (rawKey => {
+            const key = rawKey.toLowerCase ();
+            const {logs, confirmations} = processingTransactions[rawKey];
             const log = logs[0];
             const escanLink = `https://etherscan.io/address/${log.args.to}`;
-            const escanTx = `https://etherscan.io/tx/${processingTransactions[key].tx}`;
+            const escanTx = `https://etherscan.io/tx/${processingTransactions[rawKey].tx}`;
+            const currentBalance = currentBalances[key];
             return (
               <tr key={key}>
                 <td>{key}</td>
                 <td><a href={escanLink}>etherscan addr</a></td>
                 <td><a href={escanTx}>etherscan tx</a></td>
                 <td>{log.args.value.toNumber ()}</td>
-                <td>{currentBalances[key]}</td>
+                <td>{currentBalance}</td>
+                <td>{confirmations}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
-      <pre><code>{JSON.stringify (processingTransactions, null, 2)}</code></pre>
     </div>
   );
 };
@@ -62,7 +65,7 @@ export class BulkSender extends React.Component {
 
     this.state = {
       // unprocessedData: dummyData,
-      unprocessedData: dummyData,
+      unprocessedData: [],
       processingTransactions: {},
       processedData: {},
       processingData: {},
@@ -105,7 +108,6 @@ export class BulkSender extends React.Component {
 
     let processingData = {};
     let processingTransactions = {};
-    let failedData = {};
     // let batch = web3.createBatch ();
 
     Object.keys (unprocessedData).map (async key => {
@@ -155,7 +157,7 @@ export class BulkSender extends React.Component {
   };
 
   updateCurrentBalances = async () => {
-    const {newToken, web3} = this.props;
+    const {newToken} = this.props;
     const {processingTransactions} = this.state;
     let newBalances = {};
     const promises = Object.keys (processingTransactions).map (async txHash => {
@@ -166,14 +168,13 @@ export class BulkSender extends React.Component {
         newToken
           .balanceOf (toAddr)
           .then (newBalance => {
-            newBalances[toAddr] = newBalance.toNumber ();
+            newBalances[toAddr.toLowerCase ()] = newBalance.toNumber ();
           })
           .then (resolve)
           .catch (reject);
       });
     });
     return Promise.all (promises).then (() => {
-      console.log ('setting new Balances ->', newBalances);
       this.setState ({
         currentBalances: newBalances,
       });
@@ -205,7 +206,10 @@ export class BulkSender extends React.Component {
               web3.eth.getBlock (resolvedReceipt.blockNumber, (err, block) => {
                 web3.eth.getBlock ('latest', (err, currentBlock) => {
                   const confirmations = currentBlock.number - block.number;
-                  console.log ('--->', confirmations, currentBlock, block);
+                  processingTransactions[key].confirmations = confirmations;
+                  this.setState ({
+                    processingTransactions: processingTransactions,
+                  });
                 });
               });
             } catch (e) {
@@ -222,11 +226,7 @@ export class BulkSender extends React.Component {
 
   pollTransactions = async () => {
     if (this.timeoutId) clearTimeout (this.timeoutId);
-    const {
-      processingData,
-      processingTransactions,
-      currentBalances,
-    } = this.state;
+    const {processingTransactions} = this.state;
     if (Object.keys (processingTransactions).length <= 0) {
       // Done!
       console.log ('done');
@@ -234,7 +234,6 @@ export class BulkSender extends React.Component {
         completed: true,
       });
     } else {
-      console.log (processingTransactions);
       await this.updateCurrentBalances ();
       await this.updateCheckTransactions ();
       this.timeoutId = setTimeout (this.pollTransactions, 1000);
@@ -253,7 +252,6 @@ export class BulkSender extends React.Component {
       processingData,
     } = this.state;
 
-    console.log (processingTransactions);
     return (
       <div className="bulk-sender">
         <h2>Transfer SHOPIN</h2>
