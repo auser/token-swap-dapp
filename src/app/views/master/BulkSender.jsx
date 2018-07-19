@@ -111,39 +111,45 @@ export class BulkSender extends React.Component {
     // let batch = web3.createBatch ();
 
     Object.keys (unprocessedData).map (async key => {
+      const currentBalance = await newToken.balanceOf (key);
       processingData[key] = calculateAmount (unprocessedData[key]);
-      newToken
-        .transfer (key, processingData[key], {
-          from: accounts[0],
-          gasPrice: 35 * 10 ** 9,
-        })
-        .then (tx => {
-          processingTransactions[key] = {...tx, status: 'processing'};
-        })
-        .catch (err => {
-          console.log ('Not adding transaction?', err);
-          // processingTransactions[key] = {
-          //   logs: [
-          //     {
-          //       args: {
-          //         from: accounts[0],
-          //         to: key,
-          //         value: new BigNumber (processingData[key]),
-          //       },
-          //     },
-          //   ],
-          //   status: 'aborted',
-          // };
-        })
-        .then (() => {
-          this.setState (
-            {
-              processingTransactions,
-              processingData,
-            },
-            this.pollTransactions
-          );
-        });
+      if (currentBalance === processingData[key]) {
+        console.log ('Not sending as the token numbers have already been sent');
+        this.pollTransactions ();
+      } else {
+        newToken
+          .transfer (key, processingData[key], {
+            from: accounts[0],
+            gasPrice: 35 * 10 ** 9,
+          })
+          .then (tx => {
+            processingTransactions[key] = {...tx, status: 'processing'};
+          })
+          .catch (err => {
+            console.log ('Not adding transaction?', err);
+            // processingTransactions[key] = {
+            //   logs: [
+            //     {
+            //       args: {
+            //         from: accounts[0],
+            //         to: key,
+            //         value: new BigNumber (processingData[key]),
+            //       },
+            //     },
+            //   ],
+            //   status: 'aborted',
+            // };
+          })
+          .then (() => {
+            this.setState (
+              {
+                processingTransactions,
+                processingData,
+              },
+              this.pollTransactions
+            );
+          });
+      }
     });
 
     // this.setState (
@@ -205,7 +211,8 @@ export class BulkSender extends React.Component {
               }
               web3.eth.getBlock (resolvedReceipt.blockNumber, (err, block) => {
                 web3.eth.getBlock ('latest', (err, currentBlock) => {
-                  const confirmations = currentBlock.number - block.number;
+                  let confirmations = currentBlock.number - block.number;
+                  confirmations = confirmations < 0 ? 0 : confirmations;
                   processingTransactions[key].confirmations = confirmations;
                   this.setState (
                     {
