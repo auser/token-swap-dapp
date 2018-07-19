@@ -207,9 +207,12 @@ export class BulkSender extends React.Component {
                 web3.eth.getBlock ('latest', (err, currentBlock) => {
                   const confirmations = currentBlock.number - block.number;
                   processingTransactions[key].confirmations = confirmations;
-                  this.setState ({
-                    processingTransactions: processingTransactions,
-                  });
+                  this.setState (
+                    {
+                      processingTransactions: processingTransactions,
+                    },
+                    resolve
+                  );
                 });
               });
             } catch (e) {
