@@ -115,38 +115,42 @@ const promiseTimeout = ms =>
 (async function () {
   let instance = await contract.at (argv.tokenAddress);
 
-  const sendRawTransfer = async (i, to, amount) => {
+  const sendRawTransfer = async (i, address, amount) => {
     if (networkName === 'development') {
       return instance.transfer (address, amount, {from: owner});
     } else {
       const latestBlock = await web3.eth.getBlock ('latest');
       const latestNonce = await web3.eth.getTransactionCount (owner);
 
-      const data = instance.contract.transfer.getData (to, amount, {
+      const data = instance.contract.transfer.getData (address, amount, {
         from: owner,
       });
       // from: owner,
       const gasPrice = web3.eth.gasPrice;
       const gasLimit = web3.eth.getBlock ('latest').gasLimit;
-      const gasPriceHex = web3.toHex (gasPrice);
+      const gasPriceHex = web3.toHex (networkConfig.gasPrice);
       const gasLimitHex = web3.toHex (gasLimit);
 
-      const opts = {
-        gasLimit: gasLimitHex,
-        gasPrice: gasPriceHex,
-        to: argv.tokenAddress,
-        from: owner,
-        value: web3.toHex (0),
-        chainId: web3.toHex (web3.version.network),
-        nonce: latestNonce + 1,
-        data: data,
-      };
-      console.log (opts);
-      const transaction = new tx (opts);
-
-      transaction.sign (privateKeys[networkName]);
-      const serializedTxn = transaction.serialize ().toString ('hex');
       return new Promise ((resolve, reject) => {
+        const estimatedGas = web3.eth.estimateGas ({to: address, data: data});
+        console.log ('estimated', estimatedGas);
+
+        const opts = {
+          gas: estimatedGas * 10.101,
+          gasLimit: gasLimitHex,
+          gasPrice: gasPriceHex,
+          to: argv.tokenAddress,
+          from: owner,
+          value: web3.toHex (0),
+          chainId: web3.toHex (web3.version.network),
+          nonce: latestNonce + 1,
+          data: data,
+        };
+        console.log (opts);
+        const transaction = new tx (opts);
+
+        transaction.sign (privateKeys[networkName]);
+        const serializedTxn = transaction.serialize ().toString ('hex');
         // const rawTxnHash = web3.sha3 (serializedKey, {encoding: 'hex'});
         web3.eth.sendRawTransaction ('0x' + serializedTxn, (err, res) => {
           if (err) {
