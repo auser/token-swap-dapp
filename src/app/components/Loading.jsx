@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export const Loading = () => (
   <div className="App">
@@ -10,6 +10,6 @@ export const Loading = () => (
       </div>
     </main>
   </div>
-)
+);
 
-export default Loading
+export default Loading;

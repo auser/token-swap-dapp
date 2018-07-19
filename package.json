@@ -17,6 +17,7 @@
     "truffle"
   ],
   "dependencies": {
+    "@vtex/react-csv-parse": "^3.0.2",
     "autoprefixer": "6.5.1",
     "babel-core": "6.17.0",
     "babel-eslint": "7.1.1",

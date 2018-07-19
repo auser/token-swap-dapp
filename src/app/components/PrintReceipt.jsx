@@ -5,8 +5,11 @@ import html2canvas from 'html2canvas';
 import shopinLogo from './logo__shopin.png';
 
 const DataRow = ({title, value}) => (
-  <tr><td style={{fontSize: 18}}><strong>{title}</strong></td><td style={{fontSize: 16}}>{value}</td></tr>
-)
+  <tr>
+    <td style={{fontSize: 18}}><strong>{title}</strong></td>
+    <td style={{fontSize: 16}}>{value}</td>
+  </tr>
+);
 
 const Receipt = ({transactionHash, fromAddress, toAddress, amount}) => (
   <page
@@ -22,7 +25,7 @@ const Receipt = ({transactionHash, fromAddress, toAddress, amount}) => (
       display: 'block',
       margin: '0 auto',
       marginBottom: '0.5cm',
-      boxShadow: '0 0 0.5cm rgba(0,0,0,0.5)'
+      boxShadow: '0 0 0.5cm rgba(0,0,0,0.5)',
     }}
   >
     <div className="header">
@@ -33,19 +36,25 @@ const Receipt = ({transactionHash, fromAddress, toAddress, amount}) => (
       <h2>Token Swap Receipt</h2>
 
       <p>
-        This confirms your transfer of {amount} SHOP tokens. Thank you for supporting Shopin!
+        This confirms your transfer of
+        {' '}
+        {amount}
+        {' '}
+        SHOP tokens. Thank you for supporting Shopin!
       </p>
 
       <p>The transaction ID for your Swap Request is:</p>
       <code>{transactionHash}</code>
       <h2>Transaction details</h2>
-      <table style={{
-        width: '100%'
-      }}>
+      <table
+        style={{
+          width: '100%',
+        }}
+      >
         <tbody>
-          <DataRow title='Participant address' value={fromAddress} />
-          <DataRow title='Syndicate address' value={toAddress} />
-          <DataRow title='SHOP received' value={amount} />
+          <DataRow title="Participant address" value={fromAddress} />
+          <DataRow title="Syndicate address" value={toAddress} />
+          <DataRow title="SHOP received" value={amount} />
         </tbody>
       </table>
     </div>
@@ -63,33 +72,33 @@ class PrintReceipt extends React.Component {
 
   generatePDF = async () => {
     const input = document.getElementById ('receiptDiv');
-    this.setState({
-      printing: true
-    }, () => {
+    this.setState (
+      {
+        printing: true,
+      },
+      () => {
+        html2canvas (input, {scale: '2'}).then (canvas => {
+          const imgData = canvas.toDataURL ('image/png');
+          let pdf = new jsPDF ('portrait', 'mm', 'a4');
+          pdf.scaleFactor = 2;
 
-      html2canvas (input, {scale: '2'}).then (canvas => {
-        const imgData = canvas.toDataURL ('image/png');
-        let pdf = new jsPDF ('portrait', 'mm', 'a4');
-        pdf.scaleFactor = 2;
-
-        pdf.addImage (imgData, 'JPEG', 0, 0, 210, 297);
-        pdf.save ('receipt.pdf');
-        this.setState({printing: false})
-      });
-    })
-    };
+          pdf.addImage (imgData, 'JPEG', 0, 0, 210, 297);
+          pdf.save ('receipt.pdf');
+          this.setState ({printing: false});
+        });
+      }
+    );
+  };
 
   render () {
     return (
       <div className="printer">
         <h1>Your receipt</h1>
 
-        {
-          this.state.printing &&
+        {this.state.printing &&
           <p>
             Generating your receipt... it will download shortly...
-          </p>
-        }
+          </p>}
 
         <Receipt {...this.props.transaction} />
 
@@ -110,4 +119,4 @@ class PrintReceipt extends React.Component {
   }
 }
 
-export default PrintReceipt
+export default PrintReceipt;

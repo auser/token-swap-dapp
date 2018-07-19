@@ -1,70 +1,70 @@
-import React from 'react'
+import React from 'react';
 
 export class Admin extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor (props) {
+    super (props);
 
-    this.contract = null
+    this.contract = null;
 
     this.state = {
       loaded: false,
       transferRequestCount: 0,
-      transferRequests: []
-    }
+      transferRequests: [],
+    };
   }
 
   isOwnerViewing = async () => {
     const {match, history, accounts, factory, SwapContract} = this.props;
     const {id} = match.params;
 
-    const [found, contractId] = await factory.contractIndexForName(id)
+    const [found, contractId] = await factory.contractIndexForName (id);
     if (!found) {
       // TODO: redirect away
-      return history.replace(`/${id}`)
+      return history.replace (`/${id}`);
     }
-    const resp = await factory.getContractAtIndex(contractId);
-    const contract = SwapContract.at(resp[1])
-    this.contract = contract
-    const owner = await contract.getTokenOwnerAddress()
+    const resp = await factory.getContractAtIndex (contractId);
+    const contract = SwapContract.at (resp[1]);
+    this.contract = contract;
+    const owner = await contract.getTokenOwnerAddress ();
     let valid = accounts[0] === owner;
 
     if (!valid) {
-      console.log('not valid...')
-      return history.replace(`/${id}`)
+      console.log ('not valid...');
+      return history.replace (`/${id}`);
     }
-    this.setState({
-      loaded: true
-    })
-  }
+    this.setState ({
+      loaded: true,
+    });
+  };
 
   handleUpdate = async () => {
-    const count = await this.contract.getTransferRequestCount()
-    let requests = []
+    const count = await this.contract.getTransferRequestCount ();
+    let requests = [];
     for (let i = 0; i < count; i++) {
-      const values = await Promise.all([
-        this.contract.getTransferRequestInvestor(i),
-        this.contract.getTransferRequestAmount(i),
-      ])
+      const values = await Promise.all ([
+        this.contract.getTransferRequestInvestor (i),
+        this.contract.getTransferRequestAmount (i),
+      ]);
       const tr = {
         index: i,
         participant: values[0],
-        amount: values[1].toNumber()
-      }
-      requests.push(tr);
+        amount: values[1].toNumber (),
+      };
+      requests.push (tr);
     }
-    this.setState({
+    this.setState ({
       transferRequestCount: count,
-      transferRequests: requests
-    })
-  }
+      transferRequests: requests,
+    });
+  };
 
-  componentDidMount() {
+  componentDidMount () {
     // Handle redirecting if not owner
-    this.isOwnerViewing()
+    this.isOwnerViewing ();
     // this.handleUpdate();
   }
 
-  render() {
+  render () {
     const {transferRequests} = this.state;
 
     return (
@@ -74,10 +74,9 @@ export class Admin extends React.Component {
             <h1>Admin page</h1>
           </div>
           <div className="pure-u-1-2">
-            <button
-              className="pure-button"
-              onClick={this.handleUpdate}
-            >Reload requests</button>
+            <button className="pure-button" onClick={this.handleUpdate}>
+              Reload requests
+            </button>
           </div>
         </div>
 
@@ -91,22 +90,22 @@ export class Admin extends React.Component {
               </tr>
             </thead>
             <tbody>
-            
-            {transferRequests.map(tr => {
-              return (
-                <tr key={tr.index}>
-                  <td>{tr.index}</td>
-                  <td>{tr.participant}</td>
-                  <td>{tr.amount}</td>
-                </tr>
-              )
-            })}
+
+              {transferRequests.map (tr => {
+                return (
+                  <tr key={tr.index}>
+                    <td>{tr.index}</td>
+                    <td>{tr.participant}</td>
+                    <td>{tr.amount}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </div>
-    )
+    );
   }
 }
 
-export default Admin
+export default Admin;

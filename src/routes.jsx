@@ -3,12 +3,13 @@ import {Route, BrowserRouter, Switch, Link} from 'react-router-dom';
 
 // import Home from './app/views/home/Home';
 import Syndicate from './app/views/syndicate/Syndicate';
-import Admin from './app/views/syndicate/Admin'
+import Admin from './app/views/syndicate/Admin';
 import Investor from './app/views/investor/Investor';
-import BulkInvestor from './app/views/investor/BulkInvestor'
+import BulkInvestor from './app/views/investor/BulkInvestor';
 
-import MasterView from './app/views/master/Master'
-import ControllerView from './app/views/controller/Controller'
+import MasterView from './app/views/master/Master';
+import ControllerView from './app/views/controller/Controller';
+import BulkTransfer from './app/views/transfer/BulkTransfer';
 
 export const Routes = props => {
   const render = Component => routerProps => (
@@ -34,9 +35,10 @@ export const Routes = props => {
   const routes = (
     <BrowserRouter>
       <Switch>
-        <Route path="/controller" render={render(ControllerView)} />
-        <Route path="/master" render={render(MasterView)} />
-        <Route path="/:id/admin" render={render(Admin)} />
+        <Route path="/controller" render={render (ControllerView)} />
+        <Route path="/master" render={render (MasterView)} />
+        <Route path="/transfer" render={render (BulkTransfer)} />>
+        <Route path="/:id/admin" render={render (Admin)} />
         <Route path="/:id/bulk" render={render (BulkInvestor)} />
         <Route path="/:id" render={render (Investor)} />
         <Route path="/" render={render (Syndicate)} />
@@ -44,7 +46,7 @@ export const Routes = props => {
     </BrowserRouter>
   );
 
-  return routes
+  return routes;
 };
 
 export default Routes;

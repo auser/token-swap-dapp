@@ -1,7 +1,13 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 
-const CreateContractInstance = ({checkWhitelisted, error, deploying, web3, onCreate}) => (
+const CreateContractInstance = ({
+  checkWhitelisted,
+  error,
+  deploying,
+  web3,
+  onCreate,
+}) => (
   <div className="pure-u-1-1">
     <h3>Deploy a contract for your syndicate</h3>
     <p>
@@ -10,28 +16,35 @@ const CreateContractInstance = ({checkWhitelisted, error, deploying, web3, onCre
       contract, make sure to share your unique URL so that members of your group
       can claim their new SHOPIN Tokens.
     </p>
-    {deploying && !error ?
-      <span>Deploying</span> :
-      <button
-      className="pure-button"
-      disabled={deploying && !error}
-      onClick={onCreate}>
-      Deploy Swap Contract
-      </button>
-    }
-    <button disabled
+    {deploying && !error
+      ? <span>Deploying</span>
+      : <button
+          className="pure-button"
+          disabled={deploying && !error}
+          onClick={onCreate}
+        >
+          Deploy Swap Contract
+        </button>}
+    <button
+      disabled
       className="pure-button"
       style={{marginLeft: '15px'}}
-      onClick={onCreate}>
-        Swap Tokens
+      onClick={onCreate}
+    >
+      Swap Tokens
     </button>
 
     <h3>Your account</h3>
-    <code>{JSON.stringify(web3.accounts, null, 2)}</code>
+    <code>{JSON.stringify (web3.accounts, null, 2)}</code>
   </div>
 );
 
-const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, isReady}) => (
+const ExistingInstance = ({
+  instanceId,
+  onExecuteTransfers,
+  hasInstance,
+  isReady,
+}) => (
   <div className="pure-u-1-1">
     <h2>Token Swap Contract deployed</h2>
 
@@ -50,15 +63,13 @@ const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, isReady}
     <h3>Link for your syndicate:</h3>
     <code>
       <Link to={`/${instanceId}`}>
-        { `${location.protocol}//${location.hostname}/${instanceId}` }
+        {`${location.protocol}//${location.hostname}/${instanceId}`}
       </Link>
     </code>
 
     <h3>Distribute SHOPIN Tokens:</h3>
-    <button
-      disabled={!isReady}
-      className="pure-button swap-button">
-        Swap Tokens
+    <button disabled={!isReady} className="pure-button swap-button">
+      Swap Tokens
     </button>
   </div>
 );
@@ -70,18 +81,20 @@ export class WhitelistedInstructions extends React.Component {
     this.state = {
       ready: false,
       hasInstance: false,
-      deploying: false
+      deploying: false,
     };
   }
 
-  componentWillMount() {
-    this.contractNameExists()
-    this.props.controller.swapEnabled().then(b => this.setState({swapEnabled: b}))
+  componentWillMount () {
+    this.contractNameExists ();
+    this.props.controller
+      .swapEnabled ()
+      .then (b => this.setState ({swapEnabled: b}));
   }
 
   contractNameExists = async () => {
     const {web3, factory} = this.props;
-    console.log('contractNameExists', web3.accounts)
+    console.log ('contractNameExists', web3.accounts);
 
     factory
       .contractByNameExists (web3.accounts[0])
@@ -91,13 +104,13 @@ export class WhitelistedInstructions extends React.Component {
         this.setState ({
           ready: true,
           hasInstance,
-          deploying: false
+          deploying: false,
         })
       );
   };
 
   afterContractCreation = async () => {
-    await this.contractNameExists();
+    await this.contractNameExists ();
     if (!this.state.hasInstance) {
       setTimeout (this.afterContractCreation, 1000);
     }
@@ -106,43 +119,47 @@ export class WhitelistedInstructions extends React.Component {
   onCreateInstance = async evt => {
     evt.preventDefault ();
     const {web3, factory} = this.props;
-    this.setState({
-      deploying: true
-    }, async () => {
-      try {
-
-      await factory.insertContract (`${web3.accounts[0]}`, {from: web3.accounts[0]});
-      await this.afterContractCreation ();
-      } catch (e) {
-        this.setState({
-          error: e
-        })
+    this.setState (
+      {
+        deploying: true,
+      },
+      async () => {
+        try {
+          await factory.insertContract (`${web3.accounts[0]}`, {
+            from: web3.accounts[0],
+          });
+          await this.afterContractCreation ();
+        } catch (e) {
+          this.setState ({
+            error: e,
+          });
+        }
       }
-    })
+    );
   };
 
-  onExecuteTransfers = async (evt) => {
-    evt.preventDefault()
-    const contract = this.props.SwapContract.at(this.state.contractAddress)
-    await contract.executeTranser()
-  }
+  onExecuteTransfers = async evt => {
+    evt.preventDefault ();
+    const contract = this.props.SwapContract.at (this.state.contractAddress);
+    await contract.executeTranser ();
+  };
 
-  render() {
+  render () {
     const {web3} = this.props;
-    console.log('web3', web3)
+    console.log ('web3', web3);
 
     return (
       <div className="App">
         <div className="pure-g">
           <div className="pure-u-1-1">
-            {
-              this.state.hasInstance ?
-                <ExistingInstance
+            {this.state.hasInstance
+              ? <ExistingInstance
                   instanceId={web3.accounts[0]}
                   onExecuteTransfers={this.onExecuteTransfers}
                   hasInstance={this.props.hasInstance}
-                  isReady={this.props.isReady} /> :
-                <CreateContractInstance
+                  isReady={this.props.isReady}
+                />
+              : <CreateContractInstance
                   accounts={web3.accounts}
                   checkWhitelisted={this.props.checkWhitelisted}
                   onCreate={this.onCreateInstance}

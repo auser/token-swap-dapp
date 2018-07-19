@@ -1,56 +1,56 @@
-import React from 'react'
+import React from 'react';
 
-import Switch from '../../components/Switch'
+import Switch from '../../components/Switch';
 
 export class Paused extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor (props) {
+    super (props);
 
     this.state = {
-      paused: true
-    }
+      paused: true,
+    };
   }
 
   pollPaused = async (fn, expectedValue, id) => {
-    const currValue = await fn();
+    const currValue = await fn ();
     if (currValue !== expectedValue) {
-      if (id) clearTimeout(id);
-      id = setTimeout(() => {
-        this.pollPaused(fn, expectedValue, id);
+      if (id) clearTimeout (id);
+      id = setTimeout (() => {
+        this.pollPaused (fn, expectedValue, id);
       }, 1000);
     } else {
-      clearTimeout(id);
+      clearTimeout (id);
     }
-  }
+  };
 
   getPaused = async () => {
-    const {pauseContract} = this.props
-    const paused = await pauseContract.paused();
-    this.setState({paused})
-    return paused
-  }
+    const {pauseContract} = this.props;
+    const paused = await pauseContract.paused ();
+    this.setState ({paused});
+    return paused;
+  };
 
-  togglePause = async (evt) => {
-    evt.preventDefault();
+  togglePause = async evt => {
+    evt.preventDefault ();
     const {paused} = this.state;
     const {account, pauseContract} = this.props;
-    const methodName = paused ? 'unpause' : 'pause'
+    const methodName = paused ? 'unpause' : 'pause';
     try {
-      await pauseContract[methodName]({from: account});
-      await this.pollPaused(async () => {
-        await this.getPaused();
+      await pauseContract[methodName] ({from: account});
+      await this.pollPaused (async () => {
+        await this.getPaused ();
         return this.state.paused;
       }, !paused);
     } catch (e) {
-      console.log('error ->', e)
+      console.log ('error ->', e);
     }
+  };
+
+  componentDidMount () {
+    this.getPaused ();
   }
 
-  componentDidMount() {
-    this.getPaused();
-  }
-
-  render() {
+  render () {
     const {paused} = this.state;
     const {title} = this.props;
 
@@ -63,8 +63,8 @@ export class Paused extends React.Component {
           <Switch checked={paused} onClick={this.togglePause} />
         </div>
       </div>
-    )
+    );
   }
 }
 
-export default Paused
+export default Paused;

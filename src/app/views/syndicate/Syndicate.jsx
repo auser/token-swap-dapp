@@ -2,7 +2,7 @@ import React from 'react';
 // import {connect} from 'react-redux'
 // import { Link } from 'react-router-dom'
 
-import withContracts from '../../hocs/withContracts'
+import withContracts from '../../hocs/withContracts';
 
 import WhitelistedInstructions from '../../components/WhitelistedInstructions';
 import NotWhitelisted from '../../components/NotWhitelisted';
@@ -22,7 +22,7 @@ export class Syndicate extends React.Component {
     const {web3} = this.props;
     const {accounts} = web3;
 
-    console.log('----------->', web3)
+    console.log ('----------->', web3);
 
     if (!accounts || accounts.length === 0) {
       this.setState ({
@@ -69,5 +69,4 @@ export class Syndicate extends React.Component {
   }
 }
 
-export default withContracts('SwapController')(Syndicate)
-
+export default withContracts (Syndicate);

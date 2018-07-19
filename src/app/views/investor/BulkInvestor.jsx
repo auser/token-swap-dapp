@@ -90,21 +90,19 @@ export class Investor extends React.Component {
   };
 
   onRequestTransfers = async (amounts, txs, fromAddresses) => {
-    const contract = this.props.SwapContract.at(this.state.contractAddress)
+    const contract = this.props.SwapContract.at (this.state.contractAddress);
 
     try {
-      const evt = await contract.requestTransfers(fromAddresses, txs, amounts)
+      const evt = await contract.requestTransfers (fromAddresses, txs, amounts);
 
-      this.setState({
+      this.setState ({
         completed: true,
         completedTxId: evt.tx,
-        completedTransactions: {
-
-        }
-      })
+        completedTransactions: {},
+      });
     } catch (err) {
-      console.log("err ------------>", err)
-      this.setState({error: err})
+      console.log ('err ------------>', err);
+      this.setState ({error: err});
     }
   };
 
