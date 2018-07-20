@@ -46,6 +46,8 @@ export class RequestTransfer extends React.Component {
   };
 
   render () {
+    const {submitToAddress} = this.props;
+
     return (
       <div className="pure-u-1-1">
         <h1>Claim SHOPIN Tokens</h1>
@@ -55,7 +57,7 @@ export class RequestTransfer extends React.Component {
 
         <p>
           <code>
-            {this.props.accounts[0]}
+            {submitToAddress}
           </code>
         </p>
 

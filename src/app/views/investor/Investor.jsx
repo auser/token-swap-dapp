@@ -118,6 +118,8 @@ export class Investor extends React.Component {
       contractFound,
       error,
     } = this.state;
+    const {match} = this.props;
+    const {id} = match.params;
 
     if (!loaded) return <Loading />;
     if (!contractFound) return <InvalidAddress />;
@@ -138,6 +140,7 @@ export class Investor extends React.Component {
             ? <h3>Unable to create transfer request</h3>
             : <RequestTransfer
                 onRequestTransfer={this.onRequestTransfer}
+                submitToAddress={id}
                 {...this.props}
               />}
         </div>
