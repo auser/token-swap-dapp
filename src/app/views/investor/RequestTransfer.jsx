@@ -41,7 +41,7 @@ export class RequestTransfer extends React.Component {
                 const valueHex = new Buffer(input.slice(76), 'hex')
                 const amount = new BigNumber(util.bufferToInt(valueHex) / Math.pow(10, 9))
 
-                this.setState ({amount: amount.toNumber(), fromAddress, transactionHash: value});
+                this.setState ({amount: amount, fromAddress, transactionHash: value});
               } else {
                 this.setState({amount: 0})
               }
