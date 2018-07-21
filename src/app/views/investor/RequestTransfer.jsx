@@ -25,7 +25,9 @@ export class RequestTransfer extends React.Component {
     this.setState ({transactionHash: value}, () => {
       try {
         if (value.length <= 0) {
-          return;
+          return this.setState({
+            amount: 0
+          })
         }
         web3.eth.getTransaction(value, (err, hash) => {
           if (hash) {
