@@ -24,34 +24,39 @@ export class RequestTransfer extends React.Component {
     const value = evt.target.value;
     const {web3, submitToAddress} = this.props;
     this.setState ({transactionHash: value}, () => {
-      web3.eth.getTransaction(value, (err, hash) => {
-        if (hash) {
-          const input = hash.input;
-          const fromAddress = hash.from
-          const evtSha = web3.sha3('transfer(address,uint256)')
-          const callingFn = input.slice(2, 10)
-          const evtShaFirst = evtSha.slice(2, 10)
+      try {
+        web3.eth.getTransaction(value, (err, hash) => {
+          if (hash) {
+            const input = hash.input;
+            const fromAddress = hash.from
+            const evtSha = web3.sha3('transfer(address,uint256)')
+            const callingFn = input.slice(2, 10)
+            const evtShaFirst = evtSha.slice(2, 10)
 
-          // If the transfer function was called
-          if (callingFn === evtShaFirst) {
-            // const fromAddress = hash.from
-            const toHex = new Buffer(input.slice(11, 75), 'hex')
-            const toAddress = util.bufferToHex(toHex)
-            if (toAddress.indexOf(submitToAddress.slice(2)) >= 0) {
-            const valueHex = new Buffer(input.slice(-8), 'hex')
-            const amount = util.bufferToInt(valueHex)
+            // If the transfer function was called
+            if (callingFn === evtShaFirst) {
+              // const fromAddress = hash.from
+              const toHex = new Buffer(input.slice(11, 75), 'hex')
+              const toAddress = util.bufferToHex(toHex)
+              if (toAddress.indexOf(submitToAddress.slice(2)) >= 0) {
+              const valueHex = new Buffer(input.slice(-8), 'hex')
+              const amount = util.bufferToInt(valueHex)
 
-            this.setState ({amount, fromAddress, transactionHash: value});
+              this.setState ({amount, fromAddress, transactionHash: value});
+              } else {
+                this.setState({amount: 0})
+              }
             } else {
               this.setState({amount: 0})
             }
           } else {
             this.setState({amount: 0})
           }
-        } else {
-          this.setState({amount: 0})
-        }
-      })
+        })
+      } catch (e) {
+        console.error('A serious bug occurred', e);
+        this.setState({amount: 0})
+      }
     });
   };
 
@@ -91,7 +96,7 @@ export class RequestTransfer extends React.Component {
               type="submit"
               disabled={this.state.amount === 0}
             >
-              Claim {this.state.amount} SHOPIN Tokens
+              Claim {this.state.amount.toLocaleString()} SHOPIN Tokens
             </button>
           </p>
         </form>
