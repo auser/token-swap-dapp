@@ -1,4 +1,7 @@
 import React from 'react';
+import util from 'ethereumjs-util'
+
+window.util = util
 
 export class RequestTransfer extends React.Component {
   constructor (props) {
@@ -19,29 +22,36 @@ export class RequestTransfer extends React.Component {
 
   onUpdated = evt => {
     const value = evt.target.value;
-    const {web3, token} = this.props;
+    const {web3, submitToAddress} = this.props;
     this.setState ({transactionHash: value}, () => {
-      web3.eth.getTransactionReceipt (value, (err, obj) => {
-        if (obj) {
-          token.Transfer (
-            {},
-            {
-              fromBlock: obj.blockNumber,
-              toBlock: obj.blockNumber + 1,
-            },
-            (err, res) => {
-              if (!err) {
-                const {args} = res;
-                const fromAddress = args.from;
-                const amount = args.value.toNumber ();
-                this.setState ({amount, fromAddress, transactionHash: value});
-              }
+      web3.eth.getTransaction(value, (err, hash) => {
+        if (hash) {
+          const input = hash.input;
+          const fromAddress = hash.from
+          const evtSha = web3.sha3('transfer(address,uint256)')
+          const callingFn = input.slice(2, 10)
+          const evtShaFirst = evtSha.slice(2, 10)
+
+          // If the transfer function was called
+          if (callingFn === evtShaFirst) {
+            // const fromAddress = hash.from
+            const toHex = new Buffer(input.slice(11, 75), 'hex')
+            const toAddress = util.bufferToHex(toHex)
+            if (toAddress.indexOf(submitToAddress.slice(2)) >= 0) {
+            const valueHex = new Buffer(input.slice(-8), 'hex')
+            const amount = util.bufferToInt(valueHex)
+
+            this.setState ({amount, fromAddress, transactionHash: value});
+            } else {
+              this.setState({amount: 0})
             }
-          );
+          } else {
+            this.setState({amount: 0})
+          }
         } else {
-          this.setState ({amount: 0});
+          this.setState({amount: 0})
         }
-      });
+      })
     });
   };
 
