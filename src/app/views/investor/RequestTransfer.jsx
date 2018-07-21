@@ -24,6 +24,9 @@ export class RequestTransfer extends React.Component {
     const {web3, submitToAddress} = this.props;
     this.setState ({transactionHash: value}, () => {
       try {
+        if (value.length <= 0) {
+          return;
+        }
         web3.eth.getTransaction(value, (err, hash) => {
           if (hash) {
             const input = hash.input;
