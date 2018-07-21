@@ -1,7 +1,6 @@
 import React from 'react';
+import BigNumber from 'bignumber.js'
 import util from 'ethereumjs-util'
-
-window.util = util
 
 export class RequestTransfer extends React.Component {
   constructor (props) {
@@ -39,10 +38,11 @@ export class RequestTransfer extends React.Component {
               const toHex = new Buffer(input.slice(11, 75), 'hex')
               const toAddress = util.bufferToHex(toHex)
               if (toAddress.indexOf(submitToAddress.slice(2)) >= 0) {
-              const valueHex = new Buffer(input.slice(-8), 'hex')
-              const amount = util.bufferToInt(valueHex)
+                const valueHex = new Buffer(input.slice(76), 'hex')
+                const amount = new BigNumber(util.bufferToInt(valueHex) / Math.pow(10, 9))
+                console.log('amount --->', amount.toNumber(), hash)
 
-              this.setState ({amount, fromAddress, transactionHash: value});
+                this.setState ({amount, fromAddress, transactionHash: value});
               } else {
                 this.setState({amount: 0})
               }
