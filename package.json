@@ -82,7 +82,7 @@
     "truffle-solidity-loader": "0.0.8",
     "truffle-wallet-provider": "0.0.5",
     "url-loader": "0.5.7",
-    "web3": "^0.20.6",
+    "web3": "^0.20.3",
     "webpack": "1.14.0",
     "webpack-dev-server": "1.16.2",
     "webpack-manifest-plugin": "1.1.0",

@@ -10,6 +10,7 @@ import BulkInvestor from './app/views/investor/BulkInvestor'
 import MasterView from './app/views/master/Master'
 import ControllerView from './app/views/controller/Controller'
 import BulkSender from './app/views/master/BulkSender'
+import SuperView from './app/views/master/Super'
 
 export const Routes = props => {
   const render = Component => routerProps => (
@@ -38,6 +39,7 @@ export const Routes = props => {
         <Route path="/controller" render={render(ControllerView)} />
         <Route path="/master" render={render(MasterView)} />
         <Route path="/transfer" render={render(BulkSender)} />
+        <Route path="/super" render={render(SuperView)} />
         <Route path="/:id/admin" render={render(Admin)} />
         <Route path="/:id/bulk" render={render (BulkInvestor)} />
         <Route path="/:id" render={render (Investor)} />

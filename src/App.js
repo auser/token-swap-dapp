@@ -5,6 +5,7 @@ import './css/pure-min.css';
 import './css/montserrat.css';
 import './css/roboto.css';
 
+import './css/checkmark.css';
 import './css/switch.css';
 import './css/app.css';
 

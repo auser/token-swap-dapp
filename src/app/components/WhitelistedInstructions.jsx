@@ -86,12 +86,13 @@ export class WhitelistedInstructions extends React.Component {
       .contractByNameExists (accounts[0])
       .then (value => value)
       .catch (() => false)
-      .then (hasInstance =>
+      .then (hasInstance => {
         this.setState ({
           ready: true,
           hasInstance,
           deploying: false
         })
+      }
       );
   };
 

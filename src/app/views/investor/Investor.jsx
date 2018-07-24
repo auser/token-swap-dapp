@@ -22,6 +22,15 @@ const Thanks = props => (
   </div>
 );
 
+const ErrorCreatingTransfer = props => (
+  <div className='pure-u-1-1'>
+    <h3>Error creating transfer request. Try again</h3>
+    <button onClick={props.resetErrors}>
+      Try again
+    </button>
+  </div>
+)
+
 export class Investor extends React.Component {
   constructor (props) {
     super (props);
@@ -73,9 +82,10 @@ export class Investor extends React.Component {
       const evt = await contract.requestTransfer (
         req.fromAddress,
         req.transactionHash,
-        req.amount,
+        req.amount.toNumber(),
         {from: this.props.accounts[0]}
       );
+      req.amount = req.amount.toNumber()
 
       this.setState ({
         completed: true,
@@ -87,12 +97,12 @@ export class Investor extends React.Component {
         },
       });
     } catch (err) {
+      console.log('error occurred requesting transfer', err, req)
       this.setState ({error: err});
     }
   };
 
   onRequestTransfers = async (amounts, txs, fromAddresses) => {
-    console.log ('request transfers here...');
     const contract = this.props.SwapContract.at (this.state.contractAddress);
 
     try {
@@ -108,6 +118,8 @@ export class Investor extends React.Component {
       this.setState ({error: err});
     }
   };
+
+  resetErrors = () => this.setState({error: null})
 
   render () {
     const {
@@ -137,7 +149,7 @@ export class Investor extends React.Component {
       <div className="pure-g">
         <div className="pure-u-1-1">
           {error
-            ? <h3>Unable to create transfer request</h3>
+            ? <ErrorCreatingTransfer resetErrors={this.resetErrors}  />
             : <RequestTransfer
                 onRequestTransfer={this.onRequestTransfer}
                 submitToAddress={id}
