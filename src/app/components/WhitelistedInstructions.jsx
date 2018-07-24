@@ -1,6 +1,8 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 
+// import Checkmark from '../../components/Checkmark'
+
 const CreateContractInstance = ({checkWhitelisted, error, deploying, accounts, onCreate}) => (
   <div className="pure-u-1-1">
     <h3>Deploy a contract for your syndicate</h3>
@@ -31,10 +33,9 @@ const CreateContractInstance = ({checkWhitelisted, error, deploying, accounts, o
   </div>
 );
 
-const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, canWeSwap, handleSwap}) => (
+const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, canWeSwap, handleSwap, swapping, swapped, pendingTransferRequestCount}) => (
   <div className="pure-u-1-1">
     <h2>Token Swap Contract deployed</h2>
-
     <p>
       Please ensure that members of your group visit your
       unique <Link to={`/${instanceId}`}>DApp URL</Link> to claim their
@@ -55,13 +56,13 @@ const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, canWeSwa
     </code>
 
     <h3>Distribute SHOPIN Tokens:</h3>
-    {canWeSwap && <h4>Can we swap is true</h4>}
     <button
-      disabled={!canWeSwap}
+      disabled={pendingTransferRequestCount <= 0 || !canWeSwap || swapping}
       onClick={onExecuteTransfers}
       className="pure-button swap-button">
-        Swap Tokens
+        Swap {pendingTransferRequestCount} Tokens
     </button>
+    {swapped && <div>Success</div>}
   </div>
 );
 
@@ -73,7 +74,10 @@ export class WhitelistedInstructions extends React.Component {
       ready: false,
       hasInstance: false,
       deploying: false,
-      canWeSwap: false
+      canWeSwap: false,
+      contractAddress: '',
+      swapping: false,
+      swapped: false
     };
   }
 
@@ -96,7 +100,15 @@ export class WhitelistedInstructions extends React.Component {
           deploying: false
         })
       }
-      ).then(this.canWeSwap)
+      ).then(async () => {
+        try {
+          const addr = await this.getContractAddress()
+          this.setState({
+            contractAddress: addr
+          })
+        } catch (e) {}
+      }).then(this.canWeSwap)
+      .then(this.getNumberOfPendingTransferRequests)
   };
 
   canWeSwap = () => {
@@ -111,6 +123,21 @@ export class WhitelistedInstructions extends React.Component {
       this.setState({
         canWeSwap: false
       })
+    })
+  }
+
+  getNumberOfPendingTransferRequests = async () => {
+    const contract = await this.getContract()
+    const count = await contract.getTransferRequestCount()
+    let promises = [];
+    for (let i = 0; i < count; i++) {
+      promises.push(contract.getTransferRequestCompleted(i))
+    }
+    const res = await Promise.all(promises)
+    // only count incomplete swaps
+    const sum = res.reduce((acc, complete) => complete ? acc : acc + 1, 0)
+    this.setState({
+      pendingTransferRequestCount: sum
     })
   }
 
@@ -139,21 +166,41 @@ export class WhitelistedInstructions extends React.Component {
     })
   };
 
-  onExecuteTransfers = async (evt) => {
-    evt.preventDefault()
+  getContractAddress = async () => {
     const {accounts, factory} = this.props
     const [found, swapIdx] = await this.props.factory.contractIndexForName(accounts[0]) // eslint-disable-line no-unused-vars
 
     const [name, swapAddr, idx] = await factory.getContractAtIndex(swapIdx) // eslint-disable-line no-unused-vars
+    return swapAddr
+  }
 
-    console.log('swapAddr ->', swapAddr)
+  getContract = async () => {
+    const swapAddr = await this.getContractAddress()
     const contract = await this.props.SwapContract.at(swapAddr)
-    // await contract.executeTransfers({from: accounts[0]})
+    return contract;
+  }
+
+  onExecuteTransfers = async (evt) => {
+    evt.preventDefault()
+    this.setState({
+      swapped: false,
+      swapping: true
+    }, async () => {
+      const {accounts} = this.props;
+      const contract = await this.getContract()
+      await contract.executeTransfers({from: accounts[0]})
+      this.setState({
+        swapped: true,
+        swapping: false
+      }, async () => {
+        await this.getNumberOfPendingTransferRequests()
+      })
+    })
   }
 
   render() {
     const {accounts} = this.props;
-    const {canWeSwap} = this.state;
+    const {canWeSwap, swapping, swapped, pendingTransferRequestCount} = this.state;
 
     return (
       <div className="App">
@@ -165,6 +212,9 @@ export class WhitelistedInstructions extends React.Component {
                   instanceId={accounts[0]}
                   onExecuteTransfers={this.onExecuteTransfers}
                   hasInstance={this.props.hasInstance}
+                  swapping={swapping}
+                  swapped={swapped}
+                  pendingTransferRequestCount={pendingTransferRequestCount}
                   canWeSwap={canWeSwap} /> :
                 <CreateContractInstance
                   accounts={accounts}

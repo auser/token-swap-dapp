@@ -4,12 +4,12 @@ import Promise from 'bluebird'
 import Checkmark from '../../components/Checkmark'
 
 const TokenFactoryContract = ({contractAddr, transferRequests}) => {
-  const total = transferRequests.reduce((acc, tr) => acc + tr.amount.toNumber(), 0)
+  const total = transferRequests.reduce((acc, tr) => acc + tr.completed ? 0 : tr.amount.toNumber(), 0)
   return (
     <div className='pure-u-1-1'>
       <h4>Syndicate address: {contractAddr}</h4>
-      <h4>Total tokens requested: {total}</h4>
-      <table className='pure-table'>
+      <h4>Pending tokens tokens requested: {total}</h4>
+      <table className='pure-table pure-table-bordered'>
       <thead>
         <tr>
           <th>Requester</th>
@@ -28,7 +28,7 @@ const TokenFactoryContract = ({contractAddr, transferRequests}) => {
               <td>{tr.investor}</td>
               <td>{tr.amount.toNumber()}</td>
               <td>{tr.originalTokenBalance.toNumber() / (10 ** 9)}</td>
-              <td>{tr.newTokenBalance.toNumber() / 10 ** 18}</td>
+              <td>{tr.newTokenBalance.toNumber() / 10 ** 9}</td>
               <td>{tr.completed && <Checkmark />}</td>
             </tr>
           )
@@ -56,6 +56,7 @@ export class Super extends React.Component {
 
     if (accounts[0] !== owner) {
       history.replace('/')
+      // console.log('RENABLE isOwner in Super view')
     }
   }
 

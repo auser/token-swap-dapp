@@ -1,4 +1,5 @@
 import React from 'react';
+import {confirmTransferDetails} from '../../../utils/confirmTransferDetails'
 
 const tdStyle = {
   fontSize: 12
@@ -18,7 +19,7 @@ const RequestTokenItem = ({transaction, idx}) => (
       {transaction.toAddress}
     </td>
     <td style={tdStyle}>
-      {transaction.amount}
+      {transaction.amount.toNumber()}
     </td>
   </tr>
 );
@@ -68,10 +69,12 @@ export class BulkRequestTokens extends React.Component {
 
   checkTransactionHash = async (txHash) => {
     try {
+      const {accounts, web3} = this.props
       if (txHash.length === 0) return null;
-      return await this.extractTransactionHash(txHash);
+      return await confirmTransferDetails(txHash, accounts[0], web3);
     } catch(e) {
       console.log('error ->', e);
+      return null;
     }
   }
 
@@ -96,9 +99,10 @@ export class BulkRequestTokens extends React.Component {
     evt.preventDefault ();
     const {transactionObjects} = this.state;
 
-    const txAddresses = transactionObjects.map(tx => tx.hash)
-    const amounts = transactionObjects.map(tx => tx.amount);
+    const txAddresses = transactionObjects.map(tx => tx.transactionHash)
+    const amounts = transactionObjects.map(tx => tx.amount.toNumber());
     const participants = transactionObjects.map(tx => tx.fromAddress)
+
     this.props.onRequestTransfers (amounts, txAddresses, participants);
   };
 
@@ -154,7 +158,7 @@ export class BulkRequestTokens extends React.Component {
           </thead>
           <tbody>
             {transactionObjects.map ((t, idx) => (
-              <RequestTokenItem key={t.hash} idx={idx} transaction={t} />
+              <RequestTokenItem key={t.transactionHash} idx={idx} transaction={t} />
             ))}
           </tbody>
         </table>

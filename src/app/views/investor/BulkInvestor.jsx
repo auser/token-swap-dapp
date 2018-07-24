@@ -91,9 +91,13 @@ export class Investor extends React.Component {
 
   onRequestTransfers = async (amounts, txs, fromAddresses) => {
     const contract = this.props.SwapContract.at(this.state.contractAddress)
+    const {accounts} = this.props
 
     try {
-      const evt = await contract.requestTransfers(fromAddresses, txs, amounts)
+      console.log('from: ', fromAddresses, txs, amounts, accounts[0])
+      const evt = await contract.requestTransfers(fromAddresses, txs, amounts, {from: accounts[0]})
+
+      console.log('evt ->', evt)
 
       this.setState({
         completed: true,
@@ -107,6 +111,8 @@ export class Investor extends React.Component {
       this.setState({error: err})
     }
   };
+
+  resetErrors = async () => this.setState({error: null})
 
   render () {
     const {
@@ -134,7 +140,10 @@ export class Investor extends React.Component {
       <div className="pure-g">
         <div className="pure-u-1-1">
           {error
-            ? <h3>Unable to create transfer request</h3>
+            ? (<div className="error">
+                <h3>Unable to create transfer request</h3>
+                <button className="pure-button" onClick={this.resetErrors}>Try again</button>
+              </div>)
             : <BulkRequestTokens
                 onRequestTransfers={this.onRequestTransfers}
                 {...this.props}
