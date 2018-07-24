@@ -31,7 +31,7 @@ const CreateContractInstance = ({checkWhitelisted, error, deploying, accounts, o
   </div>
 );
 
-const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, isReady}) => (
+const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, canWeSwap, handleSwap}) => (
   <div className="pure-u-1-1">
     <h2>Token Swap Contract deployed</h2>
 
@@ -55,8 +55,10 @@ const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, isReady}
     </code>
 
     <h3>Distribute SHOPIN Tokens:</h3>
+    {canWeSwap && <h4>Can we swap is true</h4>}
     <button
-      disabled={!isReady}
+      disabled={!canWeSwap}
+      onClick={onExecuteTransfers}
       className="pure-button swap-button">
         Swap Tokens
     </button>
@@ -70,7 +72,8 @@ export class WhitelistedInstructions extends React.Component {
     this.state = {
       ready: false,
       hasInstance: false,
-      deploying: false
+      deploying: false,
+      canWeSwap: false
     };
   }
 
@@ -93,8 +96,23 @@ export class WhitelistedInstructions extends React.Component {
           deploying: false
         })
       }
-      );
+      ).then(this.canWeSwap)
   };
+
+  canWeSwap = () => {
+    const {controller, accounts} = this.props;
+
+    controller.canSwap(accounts[0])
+    .then(b => {
+      this.setState({
+        canWeSwap: b
+      })
+    }).catch(() => {
+      this.setState({
+        canWeSwap: false
+      })
+    })
+  }
 
   afterContractCreation = async () => {
     await this.contractNameExists();
@@ -123,12 +141,19 @@ export class WhitelistedInstructions extends React.Component {
 
   onExecuteTransfers = async (evt) => {
     evt.preventDefault()
-    const contract = this.props.SwapContract.at(this.state.contractAddress)
-    await contract.executeTranser()
+    const {accounts, factory} = this.props
+    const [found, swapIdx] = await this.props.factory.contractIndexForName(accounts[0]) // eslint-disable-line no-unused-vars
+
+    const [name, swapAddr, idx] = await factory.getContractAtIndex(swapIdx) // eslint-disable-line no-unused-vars
+
+    console.log('swapAddr ->', swapAddr)
+    const contract = await this.props.SwapContract.at(swapAddr)
+    // await contract.executeTransfers({from: accounts[0]})
   }
 
   render() {
     const {accounts} = this.props;
+    const {canWeSwap} = this.state;
 
     return (
       <div className="App">
@@ -140,7 +165,7 @@ export class WhitelistedInstructions extends React.Component {
                   instanceId={accounts[0]}
                   onExecuteTransfers={this.onExecuteTransfers}
                   hasInstance={this.props.hasInstance}
-                  isReady={this.props.isReady} /> :
+                  canWeSwap={canWeSwap} /> :
                 <CreateContractInstance
                   accounts={accounts}
                   checkWhitelisted={this.props.checkWhitelisted}

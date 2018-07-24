@@ -30,7 +30,6 @@ export class Syndicate extends React.Component {
 
   checkWhitelisted = () => {
     const {accounts, controller} = this.props;
-    console.log(accounts[0])
     controller.isWhitelisted (`${accounts[0]}`).then (isWhitelisted => {
       this.setState ({
         ready: true,
