@@ -23,43 +23,16 @@ const loadContracts = () =>
 
       // Get accounts.
       web3.eth.getAccounts (async (error, accounts) => {
-        let controller;
-        let factory;
-        let token;
-        let newToken;
-
         if (error) {
           reject (error);
         }
 
-        try {
-          controller = await controllerDef.at (
-            process.env.REACT_APP_CONTROLLER_ADDRESS
-          );
-        } catch (e) {
-          return reject (e);
-        }
-        try {
-          factory = await factoryDef.at (process.env.REACT_APP_FACTORY_ADDRESS);
-        } catch (e) {
-          return reject (e);
-        }
-
-        try {
-          token = await tokenContractDef.at (
-            process.env.REACT_APP_TOKEN_ADDRESS
-          );
-        } catch (e) {
-          return reject (e);
-        }
-
-        try {
-          newToken = await newtokenDef.at(
-            process.env.REACT_APP_NEW_TOKEN_ADDRESS
-          )
-        } catch (e) {
-          return reject(e);
-        }
+        Promise.all([
+          controllerDef.at(process.env.REACT_APP_CONTROLLER_ADDRESS),
+          factoryDef.at(process.env.REACT_APP_FACTORY_ADDRESS),
+          tokenContractDef.at(process.env.REACT_APP_TOKEN_ADDRESS),
+          newtokenDef.at(process.env.REACT_APP_NEW_TOKEN_ADDRESS),
+       ]).then(([controller, factory, token, newToken]) => {
 
         resolve ({
           accounts,
@@ -70,6 +43,8 @@ const loadContracts = () =>
           SwapContract: swapContractDef,
           web3,
         });
+        })
+          .catch(reject)
       });
     });
   });

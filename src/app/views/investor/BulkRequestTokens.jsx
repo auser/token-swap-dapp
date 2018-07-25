@@ -69,11 +69,14 @@ export class BulkRequestTokens extends React.Component {
 
   checkTransactionHash = async (txHash) => {
     try {
-      const {accounts, web3} = this.props
+      const {web3, match} = this.props
+
+      const {id} = match.params
       if (txHash.length === 0) return null;
-      return await confirmTransferDetails(txHash, accounts[0], web3);
+      const res = await confirmTransferDetails(txHash, id, web3, 9);
+      console.log('checking transaction hash', res)
+      return res;
     } catch(e) {
-      console.log('error ->', e);
       return null;
     }
   }
@@ -108,6 +111,7 @@ export class BulkRequestTokens extends React.Component {
 
 
   render () {
+    const {id} = this.props.match.params
     const {transactionObjects} = this.state;
     return (
       <div className="pure-u-1-1">
@@ -118,7 +122,7 @@ export class BulkRequestTokens extends React.Component {
 
         <p>
           <code>
-            {this.props.accounts[0]}
+            {id}
           </code>
         </p>
 

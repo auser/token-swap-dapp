@@ -1,16 +1,14 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
 
 // import Checkmark from '../../components/Checkmark'
 
 const CreateContractInstance = ({checkWhitelisted, error, deploying, accounts, onCreate}) => (
   <div className="pure-u-1-1">
-    <h3>Deploy a contract for your syndicate</h3>
+    <h3>Step 1. Deploy a contract for your syndicate</h3>
     <p>
       Deploy a Token Swap Smart Contract for your syndicate to enable members
       of your group to claim their SHOPIN Tokens. After deploying your unique swap
-      contract, make sure to share your unique URL so that members of your group
-      can claim their new SHOPIN Tokens.
+      contract, please ask your syndicate members to send their SHOP tokens to your Ethereum address displayed below:
     </p>
     {deploying && !error ?
       <span>Deploying</span> :
@@ -21,14 +19,9 @@ const CreateContractInstance = ({checkWhitelisted, error, deploying, accounts, o
       Deploy Swap Contract
       </button>
     }
-    <button disabled
-      className="pure-button"
-      style={{marginLeft: '15px'}}
-      onClick={onCreate}>
-        Swap Tokens
-    </button>
 
-    <h3>Your account</h3>
+    <h3>Step 2. Your Ethereum address</h3>
+    <p>Send this Ethereum address to your syndicate members asking them to return their SHOP tokens to this address:</p>
     <code>{accounts[0]}</code>
   </div>
 );
@@ -37,30 +30,27 @@ const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, canWeSwa
   <div className="pure-u-1-1">
     <h2>Token Swap Contract deployed</h2>
     <p>
-      Please ensure that members of your group visit your
-      unique <Link to={`/${instanceId}`}>DApp URL</Link> to claim their
-      SHOPIN Tokens. After verifying the return of your syndicate
-      participants’ SHOP Tokens, Shopin will enable the distribution
-      of SHOPIN Tokens to your group.
+      Please ensure that members of your group send their SHOP tokens to the following address to claim their SHOPIN Tokens.
+Once Shopin has received the SHOP tokens, Shopin will enable the automatic distribution of the SHOPIN tokens below.
     </p>
     <p>
       Thank you for your patience while we verify transactions and ensure the
       integrity of the Shopin community.
     </p>
 
-    <h3>Link for your syndicate:</h3>
+    <h3>Ask your participants to send their SHOP tokens to the following address:</h3>
     <code>
-      <Link to={`/${instanceId}`}>
-        { `${location.protocol}//${location.hostname}/${instanceId}` }
-      </Link>
-    </code>
+      {instanceId}
+          </code>
 
-    <h3>Distribute SHOPIN Tokens:</h3>
+      <h3>Step 3. Distribute SHOPIN Tokens:</h3>
+          <p>Once Shopin has received the SHOP tokens and verified the new transactions are valid, we'll contact you via email and let you know SHOPIN tokens are ready to be distributed.</p>
+    <p>Once all of your SHOP tokens have been collected, we'll send you the new SHOPIN tokens and the button below will be enabled:</p>
     <button
       disabled={pendingTransferRequestCount <= 0 || !canWeSwap || swapping}
       onClick={onExecuteTransfers}
       className="pure-button swap-button">
-        Swap {pendingTransferRequestCount} Tokens
+        Swap Tokens
     </button>
     {swapped && <div>Success</div>}
   </div>
@@ -111,14 +101,28 @@ export class WhitelistedInstructions extends React.Component {
       .then(this.getNumberOfPendingTransferRequests)
   };
 
-  canWeSwap = () => {
-    const {controller, accounts} = this.props;
+  getTotalAmountRequested = async () => {
+    const contract = await this.getContract()
+    const count = await contract.getTransferRequestCount();
+    let sum = 0;
+    for (let i = 0; i < count; i++) {
+      const amountRequested = await contract.getTotalAmountRequested()
+      sum += amountRequested;
+    }
 
-    controller.canSwap(accounts[0])
-    .then(b => {
-      this.setState({
-        canWeSwap: b
-      })
+    return sum;
+  }
+
+  canWeSwap = () => {
+    const {token, controller, accounts} = this.props;
+
+    Promise.all([
+      controller.canSwap(accounts[0]),
+      token.balanceOf(accounts[0]),
+      this.getTotalAmountRequested()
+    ]).then(([canSwap, balance, totalRequested]) => {
+      let b = (canSwap && balance >= totalRequested);
+      this.setState({canWeSwap: b})
     }).catch(() => {
       this.setState({
         canWeSwap: false

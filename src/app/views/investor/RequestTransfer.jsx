@@ -71,9 +71,9 @@ export class RequestTransfer extends React.Component {
 
     return (
       <div className="pure-u-1-1">
-        <h1>Claim SHOPIN Tokens</h1>
+        <h1>Claim SHOPIN tokens</h1>
         <p>
-          In order to receive SHOPIN Tokens, you'll need to send your SHOP Tokens to the following Ethereum address:
+          To send SHOPIN tokens to your participants, you'll need to ask them to send their SHOP tokens to the following address:
         </p>
 
         <p>

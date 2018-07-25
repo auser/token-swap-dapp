@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from 'react-router-dom'
 import Promise from 'bluebird'
 
 import Checkmark from '../../components/Checkmark'
@@ -7,8 +8,8 @@ const TokenFactoryContract = ({contractAddr, transferRequests}) => {
   const total = transferRequests.reduce((acc, tr) => acc + tr.completed ? 0 : tr.amount.toNumber(), 0)
   return (
     <div className='pure-u-1-1'>
-      <h4>Syndicate address: {contractAddr}</h4>
-      <h4>Pending tokens tokens requested: {total}</h4>
+      <h4>Syndicate address: <Link to={`/${contractAddr}`}>{contractAddr}</Link></h4>
+      <h4>Pending tokens tokens requested: {total.toLocaleString()}</h4>
       <table className='pure-table pure-table-bordered'>
       <thead>
         <tr>
@@ -26,7 +27,7 @@ const TokenFactoryContract = ({contractAddr, transferRequests}) => {
               key={tr.index}
               className={["pure-row", idx % 2 === 1 && 'pure-row-odd'].join(' ')}>
               <td>{tr.investor}</td>
-              <td>{tr.amount.toNumber()}</td>
+              <td>{tr.amount.toNumber().toLocaleString()}</td>
               <td>{tr.originalTokenBalance.toNumber() / (10 ** 9)}</td>
               <td>{tr.newTokenBalance.toNumber() / 10 ** 9}</td>
               <td>{tr.completed && <Checkmark />}</td>
@@ -42,6 +43,8 @@ const TokenFactoryContract = ({contractAddr, transferRequests}) => {
 export class Super extends React.Component {
   constructor (props) {
     super (props);
+
+    this.filters = []
 
     this.state = {
       tokenFactoryContracts: {},
@@ -61,9 +64,15 @@ export class Super extends React.Component {
   }
 
   componentDidMount () {
-    this.isOwner().then(() => {
-      this.updateTokenFactories()
+    this.timeoutId = setTimeout(() => {
+      this.isOwner().then(this.updateTokenFactories)
     })
+  }
+
+  componentWillUnmount() {
+    if (this.timeoutId) clearTimeout(this.timeoutId)
+
+    this.filters.forEach(f => f.stopWatching())
   }
 
   updateTokenFactories = async () => {
@@ -76,14 +85,13 @@ export class Super extends React.Component {
   };
 
   listFactoryContracts = async () => {
-    const {factory, SwapContract} = this.props;
+    const {factory} = this.props;
     const {tokenFactoryAddressCount} = this.state;
 
     let tokenFactoryContracts = {}
     for (let i = 0; i < tokenFactoryAddressCount; i++ ) {
       const [name, address, _] = await factory.getContractAtIndex(i);
-      const contract = await SwapContract.at(address)
-      tokenFactoryContracts[name] = contract
+      tokenFactoryContracts[name] = address;
     }
     this.setState({
       tokenFactoryContracts
@@ -93,36 +101,53 @@ export class Super extends React.Component {
   }
 
   listAllSwapContractTransferRequests = async () => {
-    let swapContractTransferRequests = await Promise.reduce(Object.keys(this.state.tokenFactoryContracts), (async (acc, addr) => {
-        const obj = await this.listSwapContractTransferRequests(addr)
+    try {
+      const {tokenFactoryContracts} = this.state;
+    let swapContractTransferRequests = await Promise.reduce(Object.keys(tokenFactoryContracts), (async (acc, addr) => {
+        const obj = await this.listSwapContractTransferRequests(tokenFactoryContracts[addr])
         return {
           ...acc,
           [addr]: obj
         }
       }), {})
     this.setState({tokenFactoryTransferRequests: swapContractTransferRequests})
+    } catch (e) {
+      console.log('error ->', e)
+    }
+  }
+
+  watchForParticipants = (address) => {
+    console.log('watching for participants', address)
+      const {token} = this.props;
+      return token.Transfer({fromBlock: 0, toBlock: 'latest'}, () => {}).watch((err, res) => {
+        if (!err && !!res) {
+          console.log('watch callback', err, res)
+        }
+      })
   }
 
   listSwapContractTransferRequests = async (address) => {
-    const {newToken, token} = this.props
-    const {tokenFactoryContracts} = this.state;
-    const contract = tokenFactoryContracts[address]
-    const trCountBigNumber = await contract.getTransferRequestCount()
+    const {newToken, token, SwapContract, accounts} = this.props
+    /* const {tokenFactoryContracts} = this.state; */
+
+    const contract = await SwapContract.at(address)
+    const trCountBigNumber = await contract.getTransferRequestCount({from: accounts[0]})
     const trCount = trCountBigNumber.toNumber()
     let promises = []
+    /* this.filters.push(this.watchForParticipants(address)) */
     for (let i = 0; i < trCount; i++) {
       promises.push(new Promise(async (resolve, reject) => {
 
       // fetch transfer request
       try {
         const [investor, amount, completed] = await Promise.all([
-          contract.getTransferRequestInvestor(i),
-          contract.getTransferRequestAmount(i),
-          contract.getTransferRequestCompleted(i),
+          contract.getTransferRequestInvestor(i, {from: accounts[0]}),
+          contract.getTransferRequestAmount(i, {from: accounts[0]}),
+          contract.getTransferRequestCompleted(i, {from: accounts[0]}),
         ])
         const [origBalance, newBalance] = await Promise.all([
-          token.balanceOf(investor),
-          newToken.balanceOf(investor),
+          token.balanceOf(investor, {from: accounts[0]}),
+          newToken.balanceOf(investor, {from: accounts[0]}),
         ])
         resolve({
           index: i,
@@ -131,6 +156,7 @@ export class Super extends React.Component {
           newTokenBalance: newBalance,
         })
       } catch (e) {
+        console.log('error in listSwapContractTransferRequests ->', e)
         reject(e)
       }
       }))

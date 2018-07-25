@@ -17,6 +17,9 @@ const Thanks = props => (
     <h1>Thanks for submitting your requests for a token swap.</h1>
     <p>Your transaction ID is:</p>
     <pre>{props.completedTxId}</pre>
+    <button onClick={() => window.location.reload()}>
+      Submit some more
+    </button>
   </div>
 );
 
@@ -35,31 +38,33 @@ export class Investor extends React.Component {
   }
 
   componentWillMount () {
-    const {match, factory} = this.props;
-    const {id} = match.params;
-    factory
-      .contractIndexForName (id)
-      .then (([contractFound, contractIndex]) => {
-        this.setState (
-          {
-            loaded: true,
-            contractFound,
-            contractIndex,
-          },
-          () => this.loadContract ()
-        );
-      })
-      .catch (() => this.setState ({loaded: false}));
+    this.loadContract().then(({contractFound, contractIndex, contractAddress}) => {
+      this.setState (
+        {
+          loaded: true,
+          contractFound,
+          contractIndex,
+          contractAddress,
+        },
+      )
+    }).catch((e) => {
+      console.log('error', e)
+      this.setState({loaded: false})
+    })
   }
 
   loadContract = async () => {
+    const {id} = this.props.match.params;
     const {factory} = this.props;
-    const {contractIndex} = this.state;
-    const contract = await factory.getContractAtIndex (contractIndex);
+    const contractIndex = await factory.contractIndexForName(id)
+    const contract = await factory.getContractAtIndex (contractIndex[1]);
     const contractAddress = contract[1];
     this.setState ({
       contractAddress,
     });
+    return {
+      contractIndex: contractIndex[1], contractFound: contract, contractAddress
+    }
   };
 
   onRequestTransfer = async req => {
@@ -90,11 +95,11 @@ export class Investor extends React.Component {
   };
 
   onRequestTransfers = async (amounts, txs, fromAddresses) => {
-    const contract = this.props.SwapContract.at(this.state.contractAddress)
-    const {accounts} = this.props
+    const {SwapContract, accounts} = this.props
+    const {contractAddress} = this.state
+    const contract = await SwapContract.at(contractAddress)
 
     try {
-      console.log('from: ', fromAddresses, txs, amounts, accounts[0])
       const evt = await contract.requestTransfers(fromAddresses, txs, amounts, {from: accounts[0]})
 
       console.log('evt ->', evt)
@@ -107,7 +112,13 @@ export class Investor extends React.Component {
         }
       })
     } catch (err) {
-      console.log("err ------------>", err)
+      console.log("err ------------>",
+                  err,
+                  this.state.contractAddress,
+                  fromAddresses,
+                  txs,
+                  amounts
+      )
       this.setState({error: err})
     }
   };

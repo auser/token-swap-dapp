@@ -32,8 +32,8 @@ const INFURA = process.env.INFURA || secrets.infura;
 
 const networks = {
   development: 'http://localhost:8545',
-  ropsten: `https://ropsten.infura.io/v3/${INFURA}`,
-  mainnet: `https://mainnet.infura.io/v3/${INFURA}`,
+  ropsten: `https://ropsten.infura.io/${INFURA}`,
+  mainnet: `https://mainnet.infura.io/${INFURA}`,
 };
 
 const MAINNET_PRIVATE_KEY = process.env.MAINNET_PRIVATE_KEY || secrets.mainnet;

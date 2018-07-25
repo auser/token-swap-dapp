@@ -75,9 +75,6 @@ export class Investor extends React.Component {
 
   onRequestTransfer = async req => {
     const contract = this.props.SwapContract.at (this.state.contractAddress);
-    // TODO: Check balance of original shopin tokens
-    // and request the transfer with that amount
-    // console.log('account ->', accounts[0])
     try {
       const evt = await contract.requestTransfer (
         req.fromAddress,
@@ -85,13 +82,13 @@ export class Investor extends React.Component {
         req.amount.toNumber(),
         {from: this.props.accounts[0]}
       );
-      req.amount = req.amount.toNumber()
 
       this.setState ({
         completed: true,
         completedTxId: evt.tx,
         completedTransaction: {
           ...req,
+          amount: req.amount.toNumber(),
           transactionHash: evt.tx,
           toAddress: this.state.contractAddress,
         },
