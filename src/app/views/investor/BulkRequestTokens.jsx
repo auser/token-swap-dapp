@@ -105,7 +105,7 @@ export class BulkRequestTokens extends React.Component {
           onChange={this.onTextareaChange}
           className="pure-input-1-2"
           style={{width: '100%', padding: 10, marginBottom: 20}}
-          placeholder="Enter your transaction hashes"
+          placeholder="Enter your transaction hashes separated by newlines"
         />
         </div>
         <div className="pure-u-1-1">

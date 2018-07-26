@@ -108,4 +108,4 @@ We'll transfer these tokens to the **contract address**, not the **syndicate add
 ```bash
 tok.transfer('CONTRACT_ADDRESS', 2e14, {from: 'OWNER_ADDRESS'})
 ```
-
+fLyMd-mAkEr
