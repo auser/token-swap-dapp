@@ -22,9 +22,11 @@ const TokenFactoryContract = ({
       <h4>Contract address: {deployedContractAddr}</h4>
       <h4>Pending tokens tokens requested: {total.toLocaleString ()}</h4>
       <h4>
-        Current balance
+        New token current balance:
         {' '}
-        {tokenBalance ? tokenBalance.toNumber ().toLocaleString () : 0}
+        {(
+           (tokenBalance ? tokenBalance.toNumber () : 0) / Math.pow(10, 9)
+        ).toLocaleString()}
       </h4>
       <table className="pure-table pure-table-bordered">
         <thead>

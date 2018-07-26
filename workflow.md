@@ -109,3 +109,40 @@ We'll transfer these tokens to the **contract address**, not the **syndicate add
 tok.transfer('CONTRACT_ADDRESS', 2e14, {from: 'OWNER_ADDRESS'})
 ```
 
+Using the `refresh token factories` button, verify the current balance is correct and matches (or exceeds) the pending tokens requested.
+
+2. Now, head back to the browser with the contract address in metamask that owns the deployed contract and refresh the page at the root (i.e. ![](http://localhost:3000))
+
+The button at the bottom of the page should **not** be enabled yet. It's only enabled under the two conditions:
+
+* There are equal to or more tokens in the contract address
+* The token swap is enabled via the controller
+
+3. Let's enable the swap in the controller. Back in the console, enable the token swap. Check that it is **disabled** with the following command:
+
+```bash
+c.swapEnabled()
+```
+
+It should say false. Let's flip it to true by enabling the swap:
+
+```bash
+c.enableSwap()
+```
+Let's check that it's enabled now:
+
+```bash
+c.swapEnabled()
+```
+
+In the browser, let's refresh the page and the button should enable in a moment.
+
+Let's press the button and distribute the new SHOPIN tokens to the syndicate participants! The page will update with a "success" message.
+
+4. Finally, let's add the token to metamask and see that the balance has updated with the new token.
+
+Alternatively, check the balance using the console:
+
+```bash
+tok.balanceOf('OTHER_ADDRESS').then(i => i.toNumber())
+```
