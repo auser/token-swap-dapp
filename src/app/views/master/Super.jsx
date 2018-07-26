@@ -51,8 +51,7 @@ const TokenFactoryContract = ({
                 <td>{tr.amount.toNumber ().toLocaleString ()}</td>
                 <td>{(tr.originalTokenBalance.toNumber () / Math.pow(10, 9)).toLocaleString ()}</td>
                 <td>
-                  {(tr.newTokenBalance.toNumber () /
-                    Math.pow (10, 18)).toLocaleString ()}
+                  {(tr.newTokenBalance.toNumber ()).toLocaleString ()}
                 </td>
                 <td>{tr.completed && <Checkmark />}</td>
               </tr>

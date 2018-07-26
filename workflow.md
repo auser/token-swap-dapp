@@ -106,7 +106,7 @@ Now look at the `/super` route and see how many **total** tokens are requested. 
 We'll transfer these tokens to the **contract address**, not the **syndicate address**. This is very important or the process will fail.
 
 ```bash
-tok.transfer('CONTRACT_ADDRESS', 2e14, {from: 'OWNER_ADDRESS'})
+tok.transfer('SYNDICATE_ADDRESS', 2e14, {from: 'OWNER_ADDRESS'})
 ```
 
 Using the `refresh token factories` button, verify the current balance is correct and matches (or exceeds) the pending tokens requested.
