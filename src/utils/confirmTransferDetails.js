@@ -32,7 +32,6 @@ export const confirmTransferDetails = (value, submitToAddress, web3, tokenDecima
         const amount = new BigNumber(util.bufferToInt(valueHex) / Math.pow(10, tokenDecimals));
 
         const realToAddress = '0x' + toAddress.slice(25, -1);
-        console.log(amount.toNumber());
         const details = {
           amount,
           fromAddress, 

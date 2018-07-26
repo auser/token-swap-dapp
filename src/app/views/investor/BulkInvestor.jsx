@@ -2,6 +2,7 @@ import React from 'react';
 // import { Link } from 'react-router-dom'
 import Loading from '../../components/Loading';
 import BulkRequestTokens from './BulkRequestTokens';
+import Error from '../../components/Error';
 
 const InvalidAddress = () => (
   <div className="pure-u-1-1">
@@ -153,6 +154,7 @@ export class Investor extends React.Component {
           {error
             ? (<div className="error">
                 <h3>Unable to create transfer request</h3>
+                <Error error={error} />
                 <button className="pure-button" onClick={this.resetErrors}>Try again</button>
               </div>)
             : <BulkRequestTokens

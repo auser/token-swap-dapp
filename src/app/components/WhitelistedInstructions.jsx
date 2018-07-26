@@ -1,6 +1,8 @@
 import React from 'react';
 
 // import Checkmark from '../../components/Checkmark'
+//import confirmFor from '../../utils/requireConfirmations'
+import Error from '../components/Error'
 
 const CreateContractInstance = ({checkWhitelisted, error, deploying, accounts, onCreate}) => (
   <div className="pure-u-1-1">
@@ -10,15 +12,15 @@ const CreateContractInstance = ({checkWhitelisted, error, deploying, accounts, o
       of your group to claim their SHOPIN Tokens. After deploying your unique swap
       contract, please ask your syndicate members to send their SHOP tokens to your Ethereum address displayed below:
     </p>
-    {deploying && !error ?
-      <span>Deploying</span> :
       <button
       className="pure-button"
       disabled={deploying && !error}
       onClick={onCreate}>
-      Deploy Swap Contract
+      {deploying ? 'Deploying...' : 'Deploy Swap Contract'}
       </button>
-    }
+      {
+        error && <Error error={error} />
+      }
 
     <h3>Step 2. Your Ethereum address</h3>
     <p>Send this Ethereum address to your syndicate members asking them to return their SHOP tokens to this address:</p>
@@ -82,10 +84,8 @@ export class WhitelistedInstructions extends React.Component {
     factory
       .contractByNameExists (accounts[0])
       .then (value => value)
-      .catch (() => false)
       .then (hasInstance => {
         this.setState ({
-          ready: true,
           hasInstance,
           deploying: false
         })
@@ -96,46 +96,54 @@ export class WhitelistedInstructions extends React.Component {
           this.setState({
             contractAddress: addr
           })
+          return addr
         } catch (e) {}
       }).then(this.canWeSwap)
       .then(this.getNumberOfPendingTransferRequests)
+      .catch (() => false);
   };
 
-  getTotalAmountRequested = async () => {
+  getTotalAmountRequested = async (acc) => {
     const contract = await this.getContract()
-    const count = await contract.getTransferRequestCount();
+    const count = await contract.getTransferRequestCount({from: acc});
     let sum = 0;
     for (let i = 0; i < count; i++) {
-      const amountRequested = await contract.getTotalAmountRequested()
-      sum += amountRequested;
+      try {
+        const amountRequested = await contract.getTransferRequestAmount(i, {from: acc})
+        sum += amountRequested.toNumber();
+      } catch (e) {
+        console.log('e ->', e)
+      }
     }
 
     return sum;
   }
 
-  canWeSwap = () => {
-    const {token, controller, accounts} = this.props;
+  canWeSwap = (contractAddr) => {
+    const {newToken, controller, accounts} = this.props;
 
     Promise.all([
-      controller.canSwap(accounts[0]),
-      token.balanceOf(accounts[0]),
-      this.getTotalAmountRequested()
+      controller.canSwap(accounts[0], {from: accounts[0]}),
+      newToken.balanceOf(contractAddr, {from: accounts[0]}),
+      this.getTotalAmountRequested(accounts[0])
     ]).then(([canSwap, balance, totalRequested]) => {
       let b = (canSwap && balance >= totalRequested);
-      this.setState({canWeSwap: b})
+      this.setState({ready: true, canWeSwap: b})
     }).catch(() => {
       this.setState({
-        canWeSwap: false
+        canWeSwap: false,
+        ready: true,
       })
     })
   }
 
   getNumberOfPendingTransferRequests = async () => {
+    const {accounts} = this.props;
     const contract = await this.getContract()
-    const count = await contract.getTransferRequestCount()
+    const count = await contract.getTransferRequestCount({from: accounts[0]})
     let promises = [];
     for (let i = 0; i < count; i++) {
-      promises.push(contract.getTransferRequestCompleted(i))
+      promises.push(contract.getTransferRequestCompleted(i, {from: accounts[0]}))
     }
     const res = await Promise.all(promises)
     // only count incomplete swaps
@@ -156,14 +164,17 @@ export class WhitelistedInstructions extends React.Component {
     evt.preventDefault ();
     const {accounts, factory} = this.props;
     this.setState({
-      deploying: true
+      deploying: true,
+      error: null
     }, async () => {
       try {
 
-      await factory.insertContract (`${accounts[0]}`, {from: accounts[0]});
+      await factory.insertContract (accounts[0], {from: accounts[0]});
+        /* await confirmFor(res.transactionHash, web3, 2) */
       await this.afterContractCreation ();
       } catch (e) {
         this.setState({
+          deploying: false,
           error: e
         })
       }
@@ -175,6 +186,9 @@ export class WhitelistedInstructions extends React.Component {
     const [found, swapIdx] = await this.props.factory.contractIndexForName(accounts[0]) // eslint-disable-line no-unused-vars
 
     const [name, swapAddr, idx] = await factory.getContractAtIndex(swapIdx) // eslint-disable-line no-unused-vars
+    this.setState({
+contractAddress: swapAddr
+    })
     return swapAddr
   }
 
@@ -192,12 +206,14 @@ export class WhitelistedInstructions extends React.Component {
     }, async () => {
       const {accounts} = this.props;
       const contract = await this.getContract()
-      await contract.executeTransfers({from: accounts[0]})
+      const tx = await contract.executeTransfers({from: accounts[0]})
+      console.log('tx ->', tx)
       this.setState({
         swapped: true,
         swapping: false
       }, async () => {
-        await this.getNumberOfPendingTransferRequests()
+        const pendingReq = await this.getNumberOfPendingTransferRequests()
+        console.log('pendingReq', pendingReq)
       })
     })
   }

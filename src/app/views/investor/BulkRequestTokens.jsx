@@ -19,48 +19,15 @@ const RequestTokenItem = ({transaction, idx}) => (
       {transaction.toAddress}
     </td>
     <td style={tdStyle}>
-      {transaction.amount.toNumber()}
+      {(transaction.amount.toNumber()).toLocaleString()}
     </td>
   </tr>
 );
-
-const extractTransactionHash = (web3, token) => (value) => {
-  return new Promise((resolve, reject) => {
-
-  web3.eth.getTransaction (value, (err, obj) => {
-    if (err) {
-      return reject(err);
-    } else {
-      if (!obj) {
-        return reject("Invalid transaction hash")
-      } else {
-        token.Transfer (
-          {},
-            {
-              fromBlock: obj.blockNumber,
-              toBlock: obj.blockNumber + 1,
-            },
-            (err, res) => {
-              if (err) return reject(err);
-              const fromAddress = res.args.from;
-              const toAddress = res.args.to;
-              const amount = res.args.value.toNumber ();
-              resolve({hash: value, fromAddress, amount, toAddress})
-            }
-          );
-      }
-    }
-  })
-  })
-}
 
 // TODO: Add memoization, maybe?
 export class BulkRequestTokens extends React.Component {
   constructor (props) {
     super (props);
-
-    const {web3, token} = this.props;
-    this.extractTransactionHash = extractTransactionHash(web3, token);
 
     this.state = {
       transactionObjects: [],
@@ -74,7 +41,7 @@ export class BulkRequestTokens extends React.Component {
       const {id} = match.params
       if (txHash.length === 0) return null;
       const res = await confirmTransferDetails(txHash, id, web3, 9);
-      console.log('checking transaction hash', res)
+      //console.log('checking transaction hash', res)
       return res;
     } catch(e) {
       return null;
@@ -145,7 +112,7 @@ export class BulkRequestTokens extends React.Component {
         <input
             value={`Submit ${transactionObjects.length} SHOPIN Token requests`}
             type="submit"
-            disabled={this.state.amount === 0}
+            disabled={this.state.amount === 0 || transactionObjects.length === 0}
             className="pure-button"
           />
         </div>

@@ -12,6 +12,7 @@ export class Syndicate extends React.Component {
       web3: null,
       ready: false,
       isWhitelisted: false,
+      checkingIfWhitelisted: false,
       hasAccount: false,
     };
   }
@@ -30,13 +31,18 @@ export class Syndicate extends React.Component {
 
   checkWhitelisted = () => {
     const {accounts, controller} = this.props;
+    this.setState({
+      checkingIfWhitelisted: true
+    }, () => {
     controller.isWhitelisted (accounts[0]).then (isWhitelisted => {
       this.setState ({
+        checkingIfWhitelisted: false,
         ready: true,
         hasAccount: true,
         isWhitelisted,
       });
     });
+    })
   };
 
   render () {
@@ -50,6 +56,7 @@ export class Syndicate extends React.Component {
               />
             : <NotWhitelisted
                 checkWhitelisted={this.checkWhitelisted}
+            checkingIfWhitelisted={this.state.checkingIfWhitelisted}
                 {...this.props}
               />}
         </div>
