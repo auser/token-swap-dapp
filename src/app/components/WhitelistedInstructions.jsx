@@ -206,14 +206,12 @@ contractAddress: swapAddr
     }, async () => {
       const {accounts} = this.props;
       const contract = await this.getContract()
-      const tx = await contract.executeTransfers({from: accounts[0]})
-      console.log('tx ->', tx)
+      await contract.executeTransfers({from: accounts[0]})
       this.setState({
         swapped: true,
         swapping: false
       }, async () => {
-        const pendingReq = await this.getNumberOfPendingTransferRequests()
-        console.log('pendingReq', pendingReq)
+        await this.getNumberOfPendingTransferRequests()
       })
     })
   }
