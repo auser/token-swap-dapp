@@ -13,6 +13,8 @@ contract SwapContract is Ownable {
     address public tokenAddress;
     address public controllerTokenAddress;
 
+    bool public reset = true;
+
     struct TransferRequest {
         address toAddress;
         address txAddress;
@@ -257,6 +259,22 @@ contract SwapContract is Ownable {
         returns (bool)
     {
         return _requests[idx].completed;
+    }
+
+    /**
+     * @dev get the txaddress
+     * @param idx the index of the transfer request
+     * @return tx address
+     */
+    function getTransferRequestTxHash(
+        uint idx
+    )
+        onlyTokenOwner
+        public
+        view
+        returns (address)
+    {
+        return _requests[idx].txAddress;
     }
 
     /**
