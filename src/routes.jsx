@@ -4,7 +4,7 @@ import {Route, BrowserRouter, Switch, Link} from 'react-router-dom';
 // import Home from './app/views/home/Home';
 import Syndicate from './app/views/syndicate/Syndicate';
 import Admin from './app/views/syndicate/Admin'
-import Investor from './app/views/investor/Investor';
+// import Investor from './app/views/investor/Investor';
 import BulkInvestor from './app/views/investor/BulkInvestor'
 
 import MasterView from './app/views/master/Master'
@@ -41,8 +41,7 @@ export const Routes = props => {
         <Route path="/transfer" render={render(BulkSender)} />
         <Route path="/super" render={render(SuperView)} />
         <Route path="/:id/admin" render={render(Admin)} />
-        <Route path="/:id/bulk" render={render (BulkInvestor)} />
-        <Route path="/:id" render={render (Investor)} />
+        <Route path="/:id" render={render (BulkInvestor)} />
         <Route path="/" render={render (Syndicate)} />
       </Switch>
     </BrowserRouter>

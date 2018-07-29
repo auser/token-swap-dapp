@@ -1,4 +1,5 @@
 import React from 'react';
+import BigNumber from 'bignumber.js'
 import {confirmTransferDetails} from '../../../utils/confirmTransferDetails'
 
 const tdStyle = {
@@ -19,7 +20,7 @@ const RequestTokenItem = ({transaction, idx}) => (
       {transaction.toAddress}
     </td>
     <td style={tdStyle}>
-      {(transaction.amount.toNumber()).toLocaleString()}
+      {(transaction.amount.toNumber())}
     </td>
   </tr>
 );
@@ -30,6 +31,7 @@ export class BulkRequestTokens extends React.Component {
     super (props);
 
     this.state = {
+      totalSum: new BigNumber(0),
       transactionObjects: [],
     };
   }
@@ -41,7 +43,6 @@ export class BulkRequestTokens extends React.Component {
       const {id} = match.params
       if (txHash.length === 0) return null;
       const res = await confirmTransferDetails(txHash, id, web3, 9);
-      //console.log('checking transaction hash', res)
       return res;
     } catch(e) {
       return null;
@@ -61,6 +62,11 @@ export class BulkRequestTokens extends React.Component {
         return res.filter(v => v);
       }).then(transactionObjects => {
         this.setState({transactionObjects})
+        return transactionObjects
+      }).then(transactionObjects => {
+        // 
+        const totalSum = transactionObjects.reduce((acc, tx) => acc + tx.amount.toNumber(), 0)
+        this.setState({totalSum})
       })
     }
   };
@@ -70,7 +76,7 @@ export class BulkRequestTokens extends React.Component {
     const {transactionObjects} = this.state;
 
     const txAddresses = transactionObjects.map(tx => tx.transactionHash)
-    const amounts = transactionObjects.map(tx => tx.amount.toNumber());
+    const amounts = transactionObjects.map(tx => tx.amount.toNumber() * Math.pow(10, 18));
     const participants = transactionObjects.map(tx => tx.fromAddress)
 
     this.props.onRequestTransfers (amounts, txAddresses, participants);
@@ -117,6 +123,10 @@ export class BulkRequestTokens extends React.Component {
           />
         </div>
         </form>
+
+        <div className="pure-u-1-1">
+          <p>Total tokens requested: {new BigNumber(this.state.totalSum).toNumber()}</p>
+        </div>
 
         <table className="pure-table pure-table-bordered">
           <thead>

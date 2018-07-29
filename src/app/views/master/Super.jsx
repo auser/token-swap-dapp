@@ -20,12 +20,12 @@ const TokenFactoryContract = ({
         Syndicate address: <Link to={`/${contractAddr}`}>{contractAddr}</Link>
       </h4>
       <h4>Contract address: {deployedContractAddr}</h4>
-      <h4>Pending tokens tokens requested: {total.toLocaleString ()}</h4>
+      <h4>Pending tokens tokens requested: {(total * Math.pow(10, 9))}</h4>
       <h4>
         New token current balance:
         {' '}
         {(
-           (tokenBalance ? tokenBalance.toNumber () : 0) / Math.pow(10, 9)
+           (tokenBalance ? tokenBalance.toNumber () : 0)
         ).toLocaleString()}
       </h4>
       <table className="pure-table pure-table-bordered">
@@ -48,8 +48,8 @@ const TokenFactoryContract = ({
                 )}
               >
                 <td>{tr.investor}</td>
-                <td>{tr.amount.toNumber ().toLocaleString ()}</td>
-                <td>{(tr.originalTokenBalance.toNumber () / Math.pow(10, 9)).toLocaleString ()}</td>
+                <td>{tr.amount.toNumber () / Math.pow(10, 9)}</td>
+                <td>{(tr.originalTokenBalance.toNumber ())}</td>
                 <td>
                   {(tr.newTokenBalance.toNumber ()).toLocaleString ()}
                 </td>

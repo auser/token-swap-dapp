@@ -44,7 +44,7 @@ export class RequestTransfer extends React.Component {
               const toAddress = util.bufferToHex(toHex)
               if (toAddress.indexOf(submitToAddress.slice(2)) >= 0) {
                 const valueHex = new Buffer(input.slice(76), 'hex')
-                const amount = new BigNumber(util.bufferToInt(valueHex))
+                const amount = new BigNumber(util.bufferToInt(valueHex) / Math.pow(10, 9))
 
                 const toAddressReal = '0x' + toAddress.slice(25, -1)
                 const nextState = {amount: amount, fromAddress, toAddress: toAddressReal, transactionHash: value}

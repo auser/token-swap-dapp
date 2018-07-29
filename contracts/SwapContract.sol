@@ -181,6 +181,14 @@ contract SwapContract is Ownable {
         return true;
     }
 
+    function withdrawAllEth()
+        onlyTokenOwner
+        public
+        returns (bool)
+    {
+        tokenOwner.transfer(address(this).balance);
+    }
+
     /**
      * @dev get the token owner address
      * @return address of the token owner

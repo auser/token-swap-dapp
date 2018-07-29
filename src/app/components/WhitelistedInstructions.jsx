@@ -52,7 +52,7 @@ Once Shopin has received the SHOP tokens, Shopin will enable the automatic distr
       disabled={pendingTransferRequestCount <= 0 || !canWeSwap || swapping}
       onClick={onExecuteTransfers}
       className="pure-button swap-button">
-        Swap Tokens
+        Execute {pendingTransferRequestCount} swap requests
     </button>
     {swapped && <div>Success</div>}
   </div>
