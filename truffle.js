@@ -43,14 +43,20 @@ module.exports = {
     mainnet: {
       network_id: 1,
       provider: mainnetProvider,
-      gas: 7900000,
-      gasPrice: web3.toWei ('100', 'gwei'),
+      gas: 1000000,
+      gasPrice: 10000000000,
+      from: '0x099d22626b2e80aa7c98942ef44527ead59b5a2f'
+      // gasPrice: web3.toWei ('100', 'shannon'),
+      // gas: 4712388
+
+      // gas: 7900000,
+      // gasPrice: web3.toWei ('100', 'gwei'),
     },
     ropsten: {
       network_id: 3,
       provider: ropstenProvider,
-      gas: 4500000,
-      gasPrice: web3.toWei ('100', 'gwei'),
+      // gas: 4500000,
+      // gasPrice: web3.toWei ('100', 'gwei'),
     },
   },
   mocha: {

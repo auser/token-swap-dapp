@@ -28,6 +28,8 @@ module.exports = function (
   ]
 ) {
   deployer.then (async function () {
+    console.log('owner ------------------>', owner)
+    
     logger.info (`Deploying transfer contract for original owner`);
 
     if (!SHOPIN_TOKEN_ADDRESS) {
@@ -43,7 +45,7 @@ module.exports = function (
 
     logger.info (`Original token for testing to ${SHOPIN_TOKEN_ADDRESS}`);
     // logger.info (`Deploying Swap controller...`);
-    await ShopinToken.deployed ();
+    // await ShopinToken.deployed ();
 
     if (!SWAP_CONTROLLER_ADDRESS) {
       await deployer.deploy (SwapController, {from: owner});

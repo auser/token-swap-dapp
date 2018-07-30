@@ -1,4 +1,5 @@
 import React from 'react';
+import BigNumber from 'bignumber.js'
 
 // import Checkmark from '../../components/Checkmark'
 //import confirmFor from '../../utils/requireConfirmations'
@@ -116,7 +117,7 @@ export class WhitelistedInstructions extends React.Component {
       }
     }
 
-    return sum;
+    return new BigNumber(sum.toPrecision(16));
   }
 
   canWeSwap = (contractAddr) => {
@@ -127,7 +128,7 @@ export class WhitelistedInstructions extends React.Component {
       newToken.balanceOf(contractAddr, {from: accounts[0]}),
       this.getTotalAmountRequested(accounts[0])
     ]).then(([canSwap, balance, totalRequested]) => {
-      let b = (canSwap && balance >= totalRequested);
+      let b = (canSwap && new BigNumber(balance).toPrecision(16) >= totalRequested);
       this.setState({ready: true, canWeSwap: b})
     }).catch(() => {
       this.setState({
