@@ -49,6 +49,8 @@ Once Shopin has received the SHOP tokens, Shopin will enable the automatic distr
       <h3>Step 3. Distribute SHOPIN Tokens:</h3>
           <p>Once Shopin has received the SHOP tokens and verified the new transactions are valid, we'll contact you via email and let you know SHOPIN tokens are ready to be distributed.</p>
     <p>Once all of your SHOP tokens have been collected, we'll send you the new SHOPIN tokens and the button below will be enabled:</p>
+    <p>
+    </p>
     <button
       disabled={pendingTransferRequestCount <= 0 || !canWeSwap || swapping}
       onClick={onExecuteTransfers}
@@ -149,6 +151,7 @@ export class WhitelistedInstructions extends React.Component {
     const res = await Promise.all(promises)
     // only count incomplete swaps
     const sum = res.reduce((acc, complete) => complete ? acc : acc + 1, 0)
+
     this.setState({
       pendingTransferRequestCount: sum
     })
@@ -170,7 +173,7 @@ export class WhitelistedInstructions extends React.Component {
     }, async () => {
       try {
 
-      await factory.insertContract (accounts[0], {from: accounts[0]});
+      await factory.insertContract (accounts[0].toLowerCase(), {from: accounts[0]});
         /* await confirmFor(res.transactionHash, web3, 2) */
       await this.afterContractCreation ();
       } catch (e) {
@@ -184,7 +187,8 @@ export class WhitelistedInstructions extends React.Component {
 
   getContractAddress = async () => {
     const {accounts, factory} = this.props
-    const [found, swapIdx] = await this.props.factory.contractIndexForName(accounts[0]) // eslint-disable-line no-unused-vars
+
+    const [found, swapIdx] = await this.props.factory.contractIndexForName(accounts[0].toLowerCase()) // eslint-disable-line no-unused-vars
 
     const [name, swapAddr, idx] = await factory.getContractAtIndex(swapIdx) // eslint-disable-line no-unused-vars
     this.setState({
