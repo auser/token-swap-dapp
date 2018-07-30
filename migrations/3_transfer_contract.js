@@ -13,6 +13,7 @@ const OLD_TOKEN_ADDRESS =
   process.env.OLD_TOKEN_ADDRESS || require ('../lib/originalToken');
 const SHOPIN_TOKEN_ADDRESS = process.env.SHOPIN_TOKEN_ADDRESS;
 const SWAP_CONTROLLER_ADDRESS = process.env.SWAP_CONTROLLER_ADDRESS;
+const SWAP_CONTRACT_ADDRESS = process.env.SWAP_CONTRACT_ADDRESS
 
 module.exports = function (
   deployer,
@@ -65,26 +66,30 @@ module.exports = function (
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    try {
-      logger.info (`
-        Deploying SwapController with argument values:
-        TokenAddress: ${SHOPIN_TOKEN_ADDRESS}
-        Controller address: ${SWAP_CONTROLLER_ADDRESS}
-        owner: ${owner}
-      `);
-      await deployer.deploy (
-        SwapContract,
-        SHOPIN_TOKEN_ADDRESS,
-        SWAP_CONTROLLER_ADDRESS,
-        owner,
-        {
-          from: owner,
-        }
-      );
-    } catch (e) {
-      logger.error (`SwapController error ${e}`);
+    if (!SWAP_CONTRACT_ADDRESS) {
+      try {
+        logger.info (`
+          Deploying SwapController with argument values:
+          TokenAddress: ${SHOPIN_TOKEN_ADDRESS}
+          Controller address: ${SWAP_CONTROLLER_ADDRESS}
+          owner: ${owner}
+        `);
+        await deployer.deploy (
+          SwapContract,
+          SHOPIN_TOKEN_ADDRESS,
+          SWAP_CONTROLLER_ADDRESS,
+          owner,
+          {
+            from: owner,
+          }
+        );
+      } catch (e) {
+        logger.error (`SwapContract error ${e}`);
+      }
+      logger.info (`Deployed swap contract to ${SwapContract.address}`);
+    } else {
+      logger.info(`Not deploying SwapContract as we have set address: ${SWAP_CONTRACT_ADDRESS}`)
     }
-    logger.info (`Deployed swap contract to ${SwapContract.address}`);
 
     try {
       logger.info (`

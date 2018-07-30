@@ -21,9 +21,9 @@ export const confirmTransferDetails = (value, submitToAddress, web3, tokenDecima
       }
 
       const toHex = new Buffer(input.slice(11, 75), 'hex');
-      const toAddress = util.bufferToHex(toHex);
+      const toAddress = util.bufferToHex(toHex).toLowerCase();
 
-      if (toAddress.indexOf(submitToAddress.slice(2)) < 0) {
+      if (toAddress.indexOf(submitToAddress.slice(2).toLowerCase()) < 0) {
         console.log(submitToAddress.slice(2), toAddress);
         // we did submitted to the wrong address
         return reject(`Submitted to different address`);
