@@ -99,7 +99,9 @@ export class Investor extends React.Component {
     console.log('onRequestTransfers -->', amounts, txs, fromAddresses)
     const {SwapContract, accounts} = this.props
     const {contractAddress} = this.state
+    console.log('contractAddress --->', contractAddress)
     const contract = await SwapContract.at(contractAddress)
+    console.log(contract)
 
     try {
       const evt = await contract.requestTransfers(fromAddresses, txs, amounts, {from: accounts[0]})

@@ -9,7 +9,7 @@ import 'zeppelin-solidity/contracts/ownership/CanReclaimToken.sol';
 import "./SwapController.sol";
 
 
-contract SwapContract is Ownable, CanReclaimToken, Destructible {
+contract SwapContract is Ownable, CanReclaimToken, Destructible  {
     using SafeMath for uint256;
     address public tokenOwner;
     address public tokenAddress;
@@ -181,6 +181,16 @@ contract SwapContract is Ownable, CanReclaimToken, Destructible {
             }
         }
         return true;
+    }
+
+    function withdrawAllTokens()
+        onlyTokenOwner
+        external
+        returns (bool)
+    {
+        ERC20 token = ERC20(tokenAddress);
+        uint256 balance = token.balanceOf(this);
+        token.transfer(owner, balance);
     }
 
     function withdrawAllEth()

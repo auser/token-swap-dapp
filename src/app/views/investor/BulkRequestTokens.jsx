@@ -79,6 +79,8 @@ export class BulkRequestTokens extends React.Component {
     const amounts = transactionObjects.map(tx => tx.amount.toNumber() * Math.pow(10, 18));
     const participants = transactionObjects.map(tx => tx.fromAddress)
 
+    console.log('handling request transfers --->', txAddresses, amounts, participants)
+
     this.props.onRequestTransfers (amounts, txAddresses, participants);
   };
 
