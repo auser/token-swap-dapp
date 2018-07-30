@@ -128,7 +128,7 @@ export class WhitelistedInstructions extends React.Component {
       newToken.balanceOf(contractAddr, {from: accounts[0]}),
       this.getTotalAmountRequested(accounts[0])
     ]).then(([canSwap, balance, totalRequested]) => {
-      let b = (canSwap && new BigNumber(balance.toPrecision(16)) >= totalRequested);
+      let b = (canSwap && (new BigNumber(balance.toPrecision(16)).toNumber() >= totalRequested.toNumber()));
       this.setState({ready: true, canWeSwap: b})
     }).catch(() => {
       this.setState({
