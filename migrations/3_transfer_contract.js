@@ -11,9 +11,9 @@ const TOKEN_OWNER =
 
 const OLD_TOKEN_ADDRESS =
   process.env.OLD_TOKEN_ADDRESS || require ('../lib/originalToken');
-const SHOPIN_TOKEN_ADDRESS = process.env.SHOPIN_TOKEN_ADDRESS;
-const SWAP_CONTROLLER_ADDRESS = process.env.SWAP_CONTROLLER_ADDRESS;
-const SWAP_CONTRACT_ADDRESS = process.env.SWAP_CONTRACT_ADDRESS
+let SHOPIN_TOKEN_ADDRESS = process.env.SHOPIN_TOKEN_ADDRESS;
+let SWAP_CONTROLLER_ADDRESS = process.env.SWAP_CONTROLLER_ADDRESS;
+let SWAP_CONTRACT_ADDRESS = process.env.SWAP_CONTRACT_ADDRESS
 
 module.exports = function (
   deployer,

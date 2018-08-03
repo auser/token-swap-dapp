@@ -20,7 +20,7 @@ const TokenFactoryContract = ({
         Syndicate address: <Link to={`/${contractAddr}`}>{contractAddr}</Link>
       </h4>
       <h4>Contract address: {deployedContractAddr}</h4>
-      <h4>Pending tokens tokens requested: {(total * Math.pow(10, 9))}</h4>
+      <h4>Pending tokens tokens requested: {(total)}</h4>
       <h4>
         New token current balance:
         {' '}

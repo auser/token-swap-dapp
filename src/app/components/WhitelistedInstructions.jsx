@@ -29,7 +29,7 @@ const CreateContractInstance = ({checkWhitelisted, error, deploying, accounts, o
   </div>
 );
 
-const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, canWeSwap, handleSwap, swapping, swapped, pendingTransferRequestCount}) => (
+const ExistingInstance = ({instanceId, onExecuteTransfers, hasInstance, canWeSwap, handleSwap, swapping, swapped, totalRequested, pendingTransferRequestCount}) => (
   <div className="pure-u-1-1">
     <h2>Token Swap Contract deployed</h2>
     <p>
@@ -49,8 +49,12 @@ Once Shopin has received the SHOP tokens, Shopin will enable the automatic distr
       <h3>Step 3. Distribute SHOPIN Tokens:</h3>
           <p>Once Shopin has received the SHOP tokens and verified the new transactions are valid, we'll contact you via email and let you know SHOPIN tokens are ready to be distributed.</p>
     <p>Once all of your SHOP tokens have been collected, we'll send you the new SHOPIN tokens and the button below will be enabled:</p>
-    <p>
-    </p>
+    <ul>
+      <li>Number of pending transfers: {pendingTransferRequestCount}</li>
+      <li>Total amount of SHOPIN tokens requested: {(
+        (totalRequested.toNumber() / Math.pow(10, 18)).toLocaleString()
+        )}</li>
+    </ul>
     <button
       disabled={pendingTransferRequestCount <= 0 || !canWeSwap || swapping}
       onClick={onExecuteTransfers}
@@ -72,7 +76,8 @@ export class WhitelistedInstructions extends React.Component {
       canWeSwap: false,
       contractAddress: '',
       swapping: false,
-      swapped: false
+      swapped: false,
+      totalRequested: new BigNumber(0),
     };
   }
 
@@ -109,17 +114,30 @@ export class WhitelistedInstructions extends React.Component {
   getTotalAmountRequested = async (acc) => {
     const contract = await this.getContract()
     const count = await contract.getTransferRequestCount({from: acc});
-    let sum = 0;
+    let promises = [];
     for (let i = 0; i < count; i++) {
-      try {
-        const amountRequested = await contract.getTransferRequestAmount(i, {from: acc})
-        sum += amountRequested.toNumber();
-      } catch (e) {
-        console.log('e ->', e)
-      }
+      promises.push(new Promise((resolve, reject) => {
+        return Promise.all([
+          contract.getTransferRequestCompleted(i, {from: acc}),
+          contract.getTransferRequestAmount(i, {from: acc})
+        ]).then(([completed, amountRequested]) => {
+          return completed ? 0 : amountRequested.toNumber();
+        })
+        .then(resolve).catch((() => 0))
+      }))
+      // try {
+      //   const amountRequested = await contract.getTransferRequestAmount(i, {from: acc})
+      //   sum += amountRequested.toNumber();
+      // } catch (e) {
+      //   console.log('e ->', e)
+      // }
     }
 
-    return new BigNumber(sum.toPrecision(16));
+    return await Promise.all(promises).then(nums => {
+      return nums.reduce((sum, i) => sum + i, 0)
+    }).then(sum => {
+      return new BigNumber(sum.toPrecision(16));
+    });
   }
 
   canWeSwap = (contractAddr) => {
@@ -129,9 +147,12 @@ export class WhitelistedInstructions extends React.Component {
       controller.canSwap(accounts[0], {from: accounts[0]}),
       newToken.balanceOf(contractAddr, {from: accounts[0]}),
       this.getTotalAmountRequested(accounts[0])
-    ]).then(([canSwap, balance, totalRequested]) => {
-      let b = (canSwap && (new BigNumber(balance.toPrecision(16)).toNumber() >= totalRequested.toNumber()));
-      this.setState({ready: true, canWeSwap: b})
+    ]).then(([canSwap, balance, totalAmountsRequested]) => {
+      const totalRequested = totalAmountsRequested;
+      const inpreciseBalance = new BigNumber(balance.toPrecision(16)).toNumber();
+      const totalRequestedInprecise = totalRequested.toNumber();
+      let b = (canSwap && inpreciseBalance >= totalRequestedInprecise);
+      this.setState({ready: true, canWeSwap: b, totalRequested, totalRequestedInprecise})
     }).catch(() => {
       this.setState({
         canWeSwap: false,
@@ -223,7 +244,7 @@ contractAddress: swapAddr
 
   render() {
     const {accounts} = this.props;
-    const {canWeSwap, swapping, swapped, pendingTransferRequestCount} = this.state;
+    const {canWeSwap, swapping, swapped, pendingTransferRequestCount, totalRequested} = this.state;
 
     return (
       <div className="App">
@@ -237,6 +258,7 @@ contractAddress: swapAddr
                   hasInstance={this.props.hasInstance}
                   swapping={swapping}
                   swapped={swapped}
+                  totalRequested={totalRequested}
                   pendingTransferRequestCount={pendingTransferRequestCount}
                   canWeSwap={canWeSwap} /> :
                 <CreateContractInstance

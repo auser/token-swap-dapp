@@ -4,12 +4,11 @@ import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import 'zeppelin-solidity/contracts/lifecycle/Destructible.sol';
-import 'zeppelin-solidity/contracts/ownership/CanReclaimToken.sol';
 
 import "./SwapController.sol";
 
 
-contract SwapContract is Ownable, CanReclaimToken, Destructible  {
+contract SwapContract is Ownable, Destructible  {
     using SafeMath for uint256;
     address public tokenOwner;
     address public tokenAddress;
