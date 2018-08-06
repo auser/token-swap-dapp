@@ -6,28 +6,32 @@ import Checkmark from '../../components/Checkmark';
 
 const TokenFactoryContract = ({
   tokenBalance,
+  tokenContract,
   deployedContractAddr,
   contractAddr,
-  transferRequests,
+  updateTokenRequests,
 }) => {
+  const transferRequests = tokenContract ? tokenContract.transferRequests : [];
+  const balances = !!tokenContract ? tokenContract.balances : 0;
   const total = transferRequests.reduce ((acc, tr) => {
     const newAmount = tr.completed ? 0 : tr.amount.toNumber ();
     return acc + newAmount;
   }, 0);
+
+  console.log ('tokenContract ---->', tokenContract);
   return (
     <div className="pure-u-1-1">
       <h4>
         Syndicate address: <Link to={`/${contractAddr}`}>{contractAddr}</Link>
       </h4>
       <h4>Contract address: {deployedContractAddr}</h4>
-      <h4>Pending tokens tokens requested: {(total)}</h4>
+      <h4>Pending tokens tokens requested: {total / Math.pow (10, 18)}</h4>
       <h4>
         New token current balance:
         {' '}
-        {(
-           (tokenBalance ? tokenBalance.toNumber () : 0)
-        ).toLocaleString()}
+        {(balances ? balances.toNumber () : 0).toLocaleString ()}
       </h4>
+      <button className="pure-btn" onClick={updateTokenRequests}>Update</button>
       <table className="pure-table pure-table-bordered">
         <thead>
           <tr>
@@ -48,12 +52,12 @@ const TokenFactoryContract = ({
                 )}
               >
                 <td>{tr.investor}</td>
-                <td>{tr.amount.toNumber () / Math.pow(10, 9)}</td>
-                <td>{(tr.originalTokenBalance.toNumber ())}</td>
+                <td>{tr.amount.toNumber () / Math.pow (10, 18)}</td>
+                <td>{tr.originalTokenBalance.toNumber ()}</td>
                 <td>
-                  {(tr.newTokenBalance.toNumber ()).toLocaleString ()}
+                  {tr.newTokenBalance.toNumber ().toLocaleString ()}
                 </td>
-                <td>{tr.completed && <Checkmark />}</td>
+                <td className="checkbox">{tr.completed && <Checkmark />}</td>
               </tr>
             );
           })}
@@ -107,10 +111,11 @@ export class Super extends React.Component {
       {
         tokenFactoryAddressCount: count.toNumber (),
       },
-      () => this.listFactoryContracts ().then (this.getBalancesForContracts)
+      () => this.listFactoryContracts ()
     );
   };
 
+  // .then (this.getBalancesForContracts)
   listFactoryContracts = async () => {
     const {factory} = this.props;
     const {tokenFactoryAddressCount} = this.state;
@@ -125,19 +130,20 @@ export class Super extends React.Component {
         tokenFactoryContracts,
       },
       () => {
-        this.listAllSwapContractTransferRequests ();
+        // this.listAllSwapContractTransferRequests ();
       }
     );
   };
 
   getBalancesForContracts = async () => {
-    const {newToken} = this.props;
     const {tokenFactoryContracts} = this.state;
 
     Promise.reduce (
       Object.keys (tokenFactoryContracts),
       async (acc, name) => {
-        const balance = await newToken.balanceOf (tokenFactoryContracts[name]);
+        const balance = await this.getBalancesForContract (
+          tokenFactoryContracts[name]
+        );
         return {
           ...acc,
           [name]: balance,
@@ -149,6 +155,13 @@ export class Super extends React.Component {
         tokenBalances,
       });
     });
+  };
+
+  getBalancesForContract = async name => {
+    const {tokenFactoryContracts} = this.state;
+    const {newToken} = this.props;
+    const balance = await newToken.balanceOf (tokenFactoryContracts[name]);
+    return balance;
   };
 
   listAllSwapContractTransferRequests = async () => {
@@ -173,6 +186,26 @@ export class Super extends React.Component {
     } catch (e) {
       console.log ('error ->', e);
     }
+  };
+
+  updateTokenRequests = async addr => {
+    console.log ('addr ->', addr);
+    const {tokenFactoryContracts, tokenFactoryTransferRequests} = this.state;
+    Promise.all ([
+      this.listSwapContractTransferRequests (tokenFactoryContracts[addr]),
+      this.getBalancesForContract (addr),
+    ]).then (([a, b]) => {
+      const newTokenFactoryTransferRequests = {
+        ...tokenFactoryTransferRequests,
+        [addr]: {
+          transferRequests: a,
+          balances: b,
+        },
+      };
+      this.setState ({
+        tokenFactoryTransferRequests: newTokenFactoryTransferRequests,
+      });
+    });
   };
 
   // UNUSED for now
@@ -251,14 +284,16 @@ export class Super extends React.Component {
           Refresh token factories
         </button>
         <h1>Number of contracts {tokenFactoryAddressCount}</h1>
-        {Object.keys (tokenFactoryTransferRequests).map (contractAddr => {
+        {Object.keys (tokenFactoryContracts).map (contractAddr => {
           return (
             <TokenFactoryContract
               key={contractAddr}
               contractAddr={contractAddr}
               deployedContractAddr={tokenFactoryContracts[contractAddr]}
               tokenBalance={tokenBalances[contractAddr]}
-              transferRequests={tokenFactoryTransferRequests[contractAddr]}
+              updateTokenRequests={() =>
+                this.updateTokenRequests (contractAddr)}
+              tokenContract={tokenFactoryTransferRequests[contractAddr]}
             />
           );
         })}
